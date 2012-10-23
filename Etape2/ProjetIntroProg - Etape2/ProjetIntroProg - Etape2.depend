@@ -1,0 +1,64 @@
+# depslib dependency file v1.0
+1350911786 source:g:\downloads\projetintroprog\etape2\projetintroprog - etape2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<conio.h>
+	"affichage.h"
+
+1351029585 source:g:\downloads\projetintroprog\etape2\projetintroprog - etape2\generation.c
+	<stdio.h>
+	<stdlib.h>
+	"generation.h"
+
+1351006059 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\generation.h
+
+1350911786 source:g:\downloads\projetintroprog\etape2\projetintroprog - etape2\gestion_fichiers.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"gestion_fichiers.h"
+
+1350929551 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\gestion_fichier.h
+
+1350911786 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\gestion_fichiers.h
+
+1351029859 source:g:\downloads\projetintroprog\etape2\projetintroprog - etape2\affichage.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"generation.h"
+	"affichage.h"
+	"gestion_fichiers.h"
+	"jeu.h"
+
+1351019202 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\affichage.h
+
+1350930335 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\gestion_fichiers.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"gestion_fichiers.h"
+
+1350930407 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\jeu.c
+	<stdio.h>
+	<stdlib.h>
+	"jeu.h"
+	"affichage.c"
+
+1351019648 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\jeu.h
+
+1350929728 g:\downloads\projetintroprog\etape2\projetintroprog - etape2\affichage.c
+	<stdio.h>
+	<stdlib.h>
+	"affichage.h"
+	"gestion_fichiers.c"
+	"jeu.c"
+
+1351022249 source:g:\downloads\projetintroprog\etape2\projetintroprog - etape2\jeu.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"jeu.h"
+	"affichage.h"
+

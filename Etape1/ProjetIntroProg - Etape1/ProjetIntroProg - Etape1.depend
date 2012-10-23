@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1350913512 source:g:\downloads\projetintroprog\etape1\projetintroprog - etape1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
