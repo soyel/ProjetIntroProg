@@ -17,7 +17,7 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
         printf("\n");
     }
     printf("\n");
-    printf("Votssre SCORE : %d\n", score);
+    printf("Votre SCORE : %d\n", score);
     printf("Aide: Faites deplacer le symbole 'o' vers la sortie, situee en bas a droite.\n");
     return;
 }
@@ -43,7 +43,8 @@ int afficher_accueil(){
     printf("################################################\n");
 
     int touche = 'o';
-    while(touche!='2' && touche!='1'){
+    while(touche!='2' && touche!='1')
+    {
             touche = getch();
     }
     if(touche == '2')
@@ -59,13 +60,13 @@ void afficher_menu(){
     char texteInfo[81];
     strcpy(texteInfo, " ");
     FILE* fichier = NULL;
-    char nomFichierAcharger[31];
+    char nomLabyrinthe[31];
     int boolFichierCharge = 0;
     while(choix_menu != 4){
         do{
             system("CLS");
             if(fichier != NULL){
-                    printf("INFO : Le fichier charge actuellement est : %s\n", nomFichierAcharger);
+                    printf("INFO : Le fichier charge actuellement est : %s\n", nomLabyrinthe);
             }
             printf("%s\n", texteInfo);
             memset(&texteInfo[0], 0, sizeof(texteInfo));
@@ -118,14 +119,17 @@ void afficher_menu(){
         else if(choix_menu == 2){
             printf("INFO : Indiquez le nom du fichier a charger.\n");
             printf("---------------------------------------------------------------------------\n");
-            printf("Nom du fichier, avec l'extension .init : ");
-            scanf("%s", nomFichierAcharger);
-            fichier = fopen(nomFichierAcharger, "r");
+            printf("Nom du fichier (sans extension) : ");
+            scanf("%s", nomLabyrinthe);
+            char nomFichier[31];
+            strcpy(nomFichier, nomLabyrinthe);
+            strcat(nomFichier, ".init");
+            fichier = fopen(nomFichier, "r");
 
             if (fichier != NULL)
             {
                 strcpy(texteInfo, "INFO : Le labyrinthe ");
-                strcat(texteInfo, nomFichierAcharger);
+                strcat(texteInfo, nomLabyrinthe);
                 strcat(texteInfo, " a ete charge avec succes");
                 boolFichierCharge = 1;
                 fclose(fichier);
@@ -134,15 +138,18 @@ void afficher_menu(){
             {
                 boolFichierCharge = 0;
                 strcpy(texteInfo, "INFO : Impossible d'ouvrir le fichier ");
-                strcat(texteInfo, nomFichierAcharger);
-                memset(&nomFichierAcharger[0], 0, sizeof(nomFichierAcharger));
+                strcat(texteInfo, nomLabyrinthe);
+                memset(&nomLabyrinthe[0], 0, sizeof(nomLabyrinthe));
             }
 
         }
         else if(choix_menu == 3){
             printf("Demarrage d'une nouvelle partie...\n");
             if(boolFichierCharge == 1){
-                fichier = fopen(nomFichierAcharger, "r");
+                char nomFichier[31];
+                strcpy(nomFichier, nomLabyrinthe);
+                strcat(nomFichier, ".init");
+                fichier = fopen(nomFichier, "r");
                 char chaine[TAILLE_LIGNE] = "";
                 int nbLig, nbCol;
                 fgets(chaine, TAILLE_LIGNE, fichier);
@@ -153,7 +160,7 @@ void afficher_menu(){
                 char laby [nbLig][nbCol];
                 size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
                 remplir_labyrinthe(fichier, &(laby[0][0]), N, M);
-                jouer(&(laby[0][0]), N, M);
+                jouer(&(laby[0][0]), N, M, nomLabyrinthe);
                 fclose(fichier);
             }
             else{
