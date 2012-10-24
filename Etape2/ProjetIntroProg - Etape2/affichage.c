@@ -17,7 +17,7 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
         printf("\n");
     }
     printf("\n");
-    printf("Votre SCORE : %d\n", score);
+    printf("Votssre SCORE : %d\n", score);
     printf("Aide: Faites deplacer le symbole 'o' vers la sortie, situee en bas a droite.\n");
     return;
 }
