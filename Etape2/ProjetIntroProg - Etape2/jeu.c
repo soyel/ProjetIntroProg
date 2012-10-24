@@ -32,6 +32,7 @@ int verifier_bonus_malus(char *laby, size_t nbColonnes, int x, int y)
         return 0;
     }
 }
+
 void deplacerAdroite(char *laby, size_t nbLignes, size_t nbColonnes, int *score){
     if(verifier_possibilite(laby, nbColonnes, 0, 1) == 1){
         *score += 10 * verifier_bonus_malus(laby, nbColonnes, 0, 1);
@@ -84,21 +85,40 @@ int verifier_position(size_t nbLignes, size_t nbColonnes){
     return 0;
 }
 
+void verifier_position_score(scoreJoueur* tab, int *nbScore, scoreJoueur scoreAenregistrer)
+{
+    int i;
+    for(i = *nbScore; i > 0 && tab[i - 1].score < scoreAenregistrer.score; i--)
+    {
+        tab[i] = tab[i - 1];
+    }
+    if(*nbScore != 10)
+    {
+        *nbScore += 1;
+    }
+    if(i != 10)
+    {
+        printf("\n---------------------------------------------------------------------------\n");
+        printf("\n\tBravo! Votre score va etre enregistre !\n");
+        printf("\tEntrez votre nom : ");
+        scanf("%s", scoreAenregistrer.nomJoueur);
+        tab[i] = scoreAenregistrer;
+    }
+}
 void enregistrer_topscore(int score, char *nomLaby)
 {
     FILE* fichier;
     char nomFichier[31];
     strcpy(nomFichier, nomLaby);
     strcat(nomFichier, ".cfg");
-    printf("nom fichier : %s\n", nomFichier);
-    fichier = fopen(nomFichier, "r+");
+    fichier = fopen(nomFichier, "a+");
+    fseek(fichier, 0, SEEK_SET);
     int auMoinsUnJoueur = 0;
     int enregistrementNom = 1;
-    char ligneLue[50] = "";
-    struct scoreJoueur scoreAenregistrer;
-    struct scoreJoueur scoreLu;
+    scoreJoueur scoreAenregistrer;
+    scoreJoueur scoreLu;
     scoreAenregistrer.score = score;
-    struct scoreJoueur tableauScore[10];
+    scoreJoueur tableauScore[10];
     int nbScore = 0;
     char chaineTemporaire[31];
     char ligneAinserer[51];
@@ -107,15 +127,14 @@ void enregistrer_topscore(int score, char *nomLaby)
 
     memset(&scoreLu.nomJoueur[0], 0, sizeof(scoreLu.nomJoueur));
     memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
+
     if(fichier != NULL)
     {
-        //lire premier ligne pour connaitre le nb de score deja enregistre
         while((caractereLu = fgetc(fichier)) != EOF)
         {
             if(caractereLu == '\n'){
                 scoreLu.score = atoi(chaineTemporaire);
                 tableauScore[nbScore] = scoreLu;
-                printf("Joueur %s avec score %d\n", scoreLu.nomJoueur, scoreLu.score);
                 memset(&scoreLu.nomJoueur[0], 0, sizeof(scoreLu.nomJoueur));
                 memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
                 enregistrementNom = 1;
@@ -136,90 +155,84 @@ void enregistrer_topscore(int score, char *nomLaby)
                     {
                         scoreLu.nomJoueur[position_caractere] = caractereLu;
                         position_caractere += 1;
-                        printf("Nom :%s\n", scoreLu.nomJoueur);
 
                     }
                     else
                     {
                         chaineTemporaire[position_caractere] = caractereLu;
                         position_caractere += 1;
-                        printf("Score :%s\n", chaineTemporaire);
                     }
                 }
             }
-
-            /*strcpy(scoreLu.nomJoueur, ligneLue);
-            fgets(ligneLue, 50, fichier);
-            scoreLu.score = atoi(ligneLue);*/
             auMoinsUnJoueur = 1;
+        }
+        if(auMoinsUnJoueur == 1)
+        {
+            scoreLu.score = atoi(chaineTemporaire);
+            tableauScore[nbScore] = scoreLu;
+            memset(&scoreLu.nomJoueur[0], 0, sizeof(scoreLu.nomJoueur));
+            memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
+            enregistrementNom = 1;
+            position_caractere = 0;
+            nbScore += 1;
+        }
 
-            //printf("Joueur %s avec score %d\n", scoreLu.nomJoueur, scoreLu.score);
-        } //Lire tant qu'on atteint pas la fin du fichier, ligne par ligne
-        //chaque ligne contient un score
-        scoreLu.score = atoi(chaineTemporaire);
-        tableauScore[nbScore] = scoreLu;
-        printf("Joueur %s avec score %d\n", scoreLu.nomJoueur, scoreLu.score);
-        memset(&scoreLu.nomJoueur[0], 0, sizeof(scoreLu.nomJoueur));
-        memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
-        enregistrementNom = 1;
-        position_caractere = 0;
-        nbScore += 1;
-        if(auMoinsUnJoueur == 0){
-            printf("Bravo! Votre score va etre enregistre !\n");
-            printf("Entrez votre nom : ");
+        if(nbScore == 0)
+        {
+            printf("\n---------------------------------------------------------------------------\n");
+            printf("\n\tBravo! Votre score va etre enregistre !\n");
+            printf("\tEntrez votre nom : ");
             scanf("%s", scoreAenregistrer.nomJoueur);
-            printf("Ce qui va etre enregistre : %s:%d", scoreAenregistrer.nomJoueur, scoreAenregistrer.score);
             itoa(scoreAenregistrer.score, chaineTemporaire, 10);
             strcpy(ligneAinserer, scoreAenregistrer.nomJoueur);
             strcat(ligneAinserer, ":");
             strcat(ligneAinserer, chaineTemporaire);
             fputs(ligneAinserer, fichier);
-            /*fputs(scoreAenregistrer.nomJoueur, fichier);
-            fputs("\o", fichier);
-            fputs(chaineTemporaire, fichier);*/
+            printf("\n--CLASSEMENT----------------------------------------------------------------\n");
+            printf("\n             Nom                           Score                            \n\n");
+            printf("\t%2d : %-30s%d\n", 1, scoreAenregistrer.nomJoueur, scoreAenregistrer.score);
         }
         else
         {
-            if(nbScore == 10)
+            int *p_nbScore = &nbScore;
+            int i;
+            verifier_position_score(&tableauScore[0], p_nbScore, scoreAenregistrer);
+            fclose(fichier);
+            fichier = fopen(nomFichier, "w+");
+            printf("\n--CLASSEMENT----------------------------------------------------------------\n");
+            printf("\n             Nom                           Score                            \n\n");
+            for(i = 0; i < nbScore; i++)
             {
-                printf("haha\n");
-            }
-            else
-            {
-                printf("Bravo! Votre score va etre enregistre !\n");
-                printf("Entrez votre nom : ");
-                scanf("%s", scoreAenregistrer.nomJoueur);
-                printf("Ce qui va etre enregistre : %s:%d", scoreAenregistrer.nomJoueur, scoreAenregistrer.score);
-                itoa(scoreAenregistrer.score, chaineTemporaire, 10);
-                strcpy(ligneAinserer, scoreAenregistrer.nomJoueur);
+                memset(&ligneAinserer[0], 0, sizeof(ligneAinserer));
+                memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
+                itoa(tableauScore[i].score, chaineTemporaire, 10);
+                strcpy(ligneAinserer, tableauScore[i].nomJoueur);
                 strcat(ligneAinserer, ":");
                 strcat(ligneAinserer, chaineTemporaire);
-                fputs("\n", fichier);
+                printf("\t%2d : %-30s%d\n", i + 1, tableauScore[i].nomJoueur, tableauScore[i].score);
+                if(i != 0)
+                {
+                    fputs("\n", fichier);
+                }
                 fputs(ligneAinserer, fichier);
             }
         }
-
-
-        //faire le trie dans le tableau
-
-        //recharger le fichier avec le bon tableau
         fclose(fichier);
     }
     else
     {
         printf("Impossible d'ouvrir\n");
-        _getch();
     }
 }
 void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe){
     system("CLS");
     laby[nbColonnes * 1 + 0] = 'o';
     int score = 0;
+    int scoreTotal = 0;
     int *p_score = &score;
     afficher_labyrinthe(laby, nbLignes, nbColonnes, score);
     char touche = 'l';
     fflush(stdin);
-    clock_t temps;
     time_t debut, fin;
     debut = time(NULL);
     while(touche != 'f'){
@@ -235,16 +248,20 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe){
                         break;
         }
         if(verifier_position(nbLignes, nbColonnes)==1){
-            //temps = clock();
             fin = time(NULL);
-            //int tempsPartie = (int) temps/CLOCKS_PER_SEC;
-            printf("tempsPartie : %d", difftime(fin, debut));
-            //enregistrer_topscore(score + tempsPartie * 10, nomLabyrinthe);
+            int tempsPartie = (int)difftime(fin, debut);
+            printf("\tMalus de temps : %d\n", tempsPartie / 2);
+            scoreTotal = score - tempsPartie / 2;
+            if(scoreTotal < 0)
+            {
+                scoreTotal = 0;
+            }
+            printf("\tScore total    : %d\n", scoreTotal);
+            enregistrer_topscore(scoreTotal, nomLabyrinthe);
             touche = 'f';
         }
     }
 
-    _getch();
     positionActuelle_X = 1;
     positionActuelle_Y = 0;
     laby[nbColonnes * (nbLignes-2) + (nbColonnes - 1)] = ' ';

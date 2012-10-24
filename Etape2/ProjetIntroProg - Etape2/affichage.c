@@ -17,8 +17,8 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
         printf("\n");
     }
     printf("\n");
-    printf("Votre SCORE : %d\n", score);
-    printf("Aide: Faites deplacer le symbole 'o' vers la sortie, situee en bas a droite.\n");
+    printf("--RESULTATS-----------------------------------------------------------------\n\n");
+    printf("\tVotre SCORE    : %d\n", score);
     return;
 }
 
@@ -66,7 +66,7 @@ void afficher_menu(){
         do{
             system("CLS");
             if(fichier != NULL){
-                    printf("INFO : Le fichier charge actuellement est : %s\n", nomLabyrinthe);
+                    printf("INFO : Le labyrinthe charge actuellement est : %s\n", nomLabyrinthe);
             }
             printf("%s\n", texteInfo);
             memset(&texteInfo[0], 0, sizeof(texteInfo));
@@ -149,18 +149,25 @@ void afficher_menu(){
                 char nomFichier[31];
                 strcpy(nomFichier, nomLabyrinthe);
                 strcat(nomFichier, ".init");
-                fichier = fopen(nomFichier, "r");
-                char chaine[TAILLE_LIGNE] = "";
-                int nbLig, nbCol;
-                fgets(chaine, TAILLE_LIGNE, fichier);
-                nbLig = atoi(chaine);
-                memset(&chaine[0], 0, sizeof(chaine));
-                fgets(chaine, TAILLE_LIGNE, fichier);
-                nbCol = atoi(chaine);
-                char laby [nbLig][nbCol];
-                size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
-                remplir_labyrinthe(fichier, &(laby[0][0]), N, M);
-                jouer(&(laby[0][0]), N, M, nomLabyrinthe);
+                char choixRecommencer = 1;
+                do
+                {
+                    fichier = fopen(nomFichier, "r");
+                    char chaine[TAILLE_LIGNE] = "";
+                    int nbLig, nbCol;
+                    fgets(chaine, TAILLE_LIGNE, fichier);
+                    nbLig = atoi(chaine);
+                    memset(&chaine[0], 0, sizeof(chaine));
+                    fgets(chaine, TAILLE_LIGNE, fichier);
+                    nbCol = atoi(chaine);
+                    char laby [nbLig][nbCol];
+                    size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
+                    remplir_labyrinthe(fichier, &(laby[0][0]), N, M);
+                    jouer(&(laby[0][0]), N, M, nomLabyrinthe);
+                    printf("\nVoulez-vous recommencer ? (O/N) : ");
+                    fflush(stdin);
+                    scanf("%c", &choixRecommencer);
+                }while(choixRecommencer != 'N');
                 fclose(fichier);
             }
             else{
