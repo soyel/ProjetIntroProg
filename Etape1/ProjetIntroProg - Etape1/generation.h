@@ -1,11 +1,6 @@
 #ifndef GENERATION_H_INCLUDED
 #define GENERATION_H_INCLUDED
 
-struct coordonnees
-{
-    int x;
-    int y;
-};
 struct coordonneesMurs
 {
     int x;
@@ -14,6 +9,7 @@ struct coordonneesMurs
 };
 
 typedef struct cellule cellule;
+
 struct cellule
 {
     int x;
@@ -25,10 +21,8 @@ struct cellule
 
 typedef cellule* chemin;
 
-
-void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes);
-void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin);
 chemin initialiserChemin(int id, int x, int y);
-void remplir_labyrinthe(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonnes);
+void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin);
+void creer_labyrinthe();
 
 #endif // GENERATION_H_INCLUDED

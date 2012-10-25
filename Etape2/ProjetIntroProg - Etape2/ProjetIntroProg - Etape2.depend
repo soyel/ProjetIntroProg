@@ -63,3 +63,46 @@
 	"jeu.h"
 	"affichage.h"
 
+1351145035 source:c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\generation.c
+	<stdio.h>
+	<stdlib.h>
+	"generation.h"
+
+1351145107 c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\generation.h
+
+1351145056 source:c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\gestion_fichiers.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"gestion_fichiers.h"
+
+1351032260 c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\gestion_fichiers.h
+
+1351144786 source:c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\jeu.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<string.h>
+	"jeu.h"
+	"affichage.h"
+
+1351119471 c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\jeu.h
+
+1351032260 c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\affichage.h
+
+1351144646 source:c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<conio.h>
+	"affichage.h"
+
+1351144612 source:c:\users\roman\documents\github\projetintroprog\etape2\projetintroprog - etape2\affichage.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"generation.h"
+	"affichage.h"
+	"gestion_fichiers.h"
+	"jeu.h"
+

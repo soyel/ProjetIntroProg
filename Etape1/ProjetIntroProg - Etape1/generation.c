@@ -1,8 +1,19 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "generation.h"
 
+chemin tabDesChemins[LIGNES][COLONNES];
+
+struct coordonneesMurs mesMurs[73];
+
+/**
+ * Initialise chaque cellule comme un début de chemin
+ * @param id identifiant de la cellule
+ * @param x abscisse de la cellule
+ * @param y ordonnée de la cellule
+ * @return la cellule comme un chemin
+ */
 chemin initialiserChemin(int id, int x, int y)
 {
     cellule* nouvelleCellule = malloc(sizeof(cellule));
@@ -17,31 +28,12 @@ chemin initialiserChemin(int id, int x, int y)
     return nouvelleCellule;
 }
 
-chemin ajouterEnfinAvecValeurs(chemin leChemin, int x, int y)
-{
-
-    cellule* nouvelleCellule = malloc(sizeof(cellule));
-
-    nouvelleCellule->x = x;
-    nouvelleCellule->y = y;
-    nouvelleCellule->celluleSuivante = NULL;
-
-    if(leChemin == NULL)
-    {
-        return nouvelleCellule;
-    }
-    else
-    {
-        cellule* tempCellule = leChemin;
-        while(tempCellule->celluleSuivante != NULL)
-        {
-            tempCellule = tempCellule->celluleSuivante;
-        }
-        tempCellule->celluleSuivante = nouvelleCellule;
-        return leChemin;
-    }
-
-}
+/**
+ * Ajoute leChemin, qui peut être une cellule ou un chemin de cellule,
+ * à la fin du chemin lesChemins
+ * @param lesChemins le chemin principal principal d'une ou plusieurs cellules
+ * @param leChemin le chemin à ajouter
+ */
 void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin)
 {
     cellule* temp = lesChemins;
@@ -53,46 +45,29 @@ void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin)
     return;
 }
 
-void remplir_labyrinthe(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonnes)
-{
-    char caractereLu;
-    size_t i, j;
-    for(i=0; i<nbLignes; i++)
-    {
-        for(j=0; j<nbColonnes; j++)
-        {
-            do
-            {
-                 caractereLu = fgetc(fichier);
-            }while(caractereLu == '\n');
-            laby[nbColonnes * i + j] = caractereLu;
-        }
-    }
-    return;
-}
-
-void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
+/**
+ * Genère le labyrinthe
+ */
+void creer_labyrinthe()
 {
     int compteurCell = 1;
     int compteurMur = 1;
-    int nbMurs = ((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/2;
-    size_t i, j;
-    chemin tabDesChemins[nbLignes][nbColonnes];
-    struct coordonneesMurs mesMurs[nbMurs];
+    int i, j;
 
-    for(i = 0; i<nbLignes; ++i)
+
+    for(i = 0; i<LIGNES; ++i)
     {
-        for(j = 0; j<nbColonnes; ++j)
+        for(j = 0; j<COLONNES; ++j)
         {
-            if(i==0 ||j==0 || i == nbLignes - 1 || j == nbColonnes - 1)
+            if(i==0 ||j==0 || i == LIGNES - 1 || j == COLONNES - 1)
             {
-                laby[nbColonnes * i+j] = '#';
+                laby[i][j] = '#';
             }
             else
             {
                 if(i%2!=0 && j%2!=0)
                 {
-                    laby[nbColonnes * i + j] = ' ';
+                    laby[i][j] = ' ';
                     tabDesChemins[i][j] = initialiserChemin(compteurCell, i, j);
                     compteurCell +=1;
                 }
@@ -100,7 +75,7 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
                 {
                     if(i%2 == 0 && j%2 == 0)
                     {
-                        laby[nbColonnes * i + j] = '#';
+                        laby[i][j] = '#';
                     }
                     else
                     {
@@ -109,12 +84,12 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
                         if(i%2==0)
                         {
                             mesMurs[compteurMur-1].type = 'H';
-                            laby[nbColonnes * i + j] = '#';
+                            laby[i][j] = 'H';
                         }
                         else
                         {
                             mesMurs[compteurMur-1].type = 'V';
-                            laby[nbColonnes * i + j] = '#';
+                            laby[i][j] = 'V';
                         }
                         compteurMur +=1;
                     }
@@ -123,7 +98,7 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         }
     }
 
-    compteurMur = nbMurs;
+    compteurMur = 73;
     int compteurAleatoire;
     int coordXTmp, coordYTmp;
     int coordXPremCell, coordYPremCell;
@@ -137,9 +112,12 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     while(compteurMur > 0)
     {
         compteurAleatoire = rand()%compteurMur;
+
         coordXTmp = mesMurs[compteurAleatoire].x;
         coordYTmp = mesMurs[compteurAleatoire].y;
+
         cellDominante = rand()%2;
+
         if(cellDominante == 0)
         {
             cell1 = -1;
@@ -171,10 +149,9 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         idPremCell = cellule1->identifiant;
         idSecCell = cellule2->identifiant;
 
-
         if(idPremCell != idSecCell)
         {
-            laby[nbColonnes * coordXTmp + coordYTmp] = ' ';
+            laby[coordXTmp][coordYTmp] = ' ';
             if((tmpDebutChemin->celluleSuivante)==NULL)
             {
                 ajouterEnfinDeListe(cellule1->premiereCellule, cellule2);
@@ -201,60 +178,8 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         compteurMur -= 1;
     }
 
-    /*int nbMalusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;
-    int nbBonusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;*/
-
-
-    int compteurCelluleVide = 0;
-    int celluleAleatoire;
-    int typeBonusMalus;
-    char bonusMalus = 'o';
-
-    struct coordonnees toutesCellulesVides[(nbLignes - 2)*(nbColonnes - 2)];
-    for(i = 0; i < nbLignes; i++)
-    {
-        for(j = 0; j < nbColonnes; j++)
-        {
-            if(laby[nbColonnes * i + j] == ' ')
-            {
-                toutesCellulesVides[compteurCelluleVide].x = i;
-                toutesCellulesVides[compteurCelluleVide].y = j;
-                compteurCelluleVide += 1;
-            }
-
-        }
-    }
-    //printf("compteurCelluleVide : %d\n", compteurCelluleVide);
-
-    while(compteurCelluleVide > 0)
-    {
-        celluleAleatoire = rand()%compteurCelluleVide;
-        typeBonusMalus = rand()%2;
-        if(typeBonusMalus == 1)
-        {
-            bonusMalus = 'm';
-            //nbMalusAdistribuer -= 1;
-        }
-        else
-        {
-            bonusMalus = 'b';
-            //nbBonusAdistribuer -= 1;
-        }
-        typeBonusMalus = rand()%20;
-        if(typeBonusMalus >=0 && typeBonusMalus <= 3)
-        {
-            laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
-        }
-
-        //laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
-
-        toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
-        toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
-        compteurCelluleVide -= 1;
-
-    }
-    laby[nbColonnes * 1 + 0] = ' ';
-    laby[nbColonnes * (nbLignes-2) + (nbColonnes-1)] = ' ';
+    laby[1][0] = ' ';
+    laby[LIGNES - 2][COLONNES - 1] = ' ';
 
     return;
 }

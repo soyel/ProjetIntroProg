@@ -7,11 +7,19 @@
 #include "gestion_fichiers.h"
 #include "jeu.h"
 
+#ifdef __WIN32__
+    #define clear() system("cls")
+#else
+    #define clear() system("clear")
+#endif
 
-void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score){
+void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score)
+{
     size_t i, j;
-    for(i=0; i<nbLignes; i++){
-        for(j=0; j<nbColonnes; j++){
+    for(i = 0; i < nbLignes; i++)
+    {
+        for(j = 0; j < nbColonnes; j++)
+        {
             printf("%c", laby[nbColonnes * i + j]);
         }
         printf("\n");
@@ -22,7 +30,8 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
     return;
 }
 
-int afficher_accueil(){
+int afficher_accueil()
+{
     printf("################################################\n");
     printf("################################################\n");
     printf("###                                          ###\n");
@@ -55,17 +64,21 @@ int afficher_accueil(){
 
 }
 
-void afficher_menu(){
+void afficher_menu()
+{
     int choix_menu = 1;
     char texteInfo[81];
     strcpy(texteInfo, " ");
     FILE* fichier = NULL;
     char nomLabyrinthe[31];
     int boolFichierCharge = 0;
-    while(choix_menu != 4){
-        do{
-            system("CLS");
-            if(fichier != NULL){
+    while(choix_menu != 4)
+    {
+        do
+        {
+            clear();
+            if(fichier != NULL)
+            {
                     printf("INFO : Le labyrinthe charge actuellement est : %s\n", nomLabyrinthe);
             }
             printf("%s\n", texteInfo);
@@ -78,13 +91,15 @@ void afficher_menu(){
             printf("---------------------------------------------------------------------------\n");
             printf("Entrez un numero : ");
             scanf("%d", &choix_menu);
-            if(choix_menu < 1 || choix_menu > 4){
+            if(choix_menu < 1 || choix_menu > 4)
+            {
                 strcpy(texteInfo, "INFO : Choix incorrecte !");
             }
         }while(choix_menu < 1 || choix_menu > 4);
 
-        system("CLS");
-        if(choix_menu == 1){
+        clear();
+        if(choix_menu == 1)
+        {
             int nbL, nbC;
             char nomLaby[31];
             printf("INFO : Pour creer un labyrinthe, entrez un nombre de lignes et de colonnes.\n");
@@ -116,7 +131,8 @@ void afficher_menu(){
                 strcat(texteInfo, nomLaby);
             }
         }
-        else if(choix_menu == 2){
+        else if(choix_menu == 2)
+        {
             printf("INFO : Indiquez le nom du fichier a charger.\n");
             printf("---------------------------------------------------------------------------\n");
             printf("Nom du fichier (sans extension) : ");
@@ -143,9 +159,11 @@ void afficher_menu(){
             }
 
         }
-        else if(choix_menu == 3){
+        else if(choix_menu == 3)
+        {
             printf("Demarrage d'une nouvelle partie...\n");
-            if(boolFichierCharge == 1){
+            if(boolFichierCharge == 1)
+            {
                 char nomFichier[31];
                 strcpy(nomFichier, nomLabyrinthe);
                 strcat(nomFichier, ".init");
@@ -170,7 +188,8 @@ void afficher_menu(){
                 }while(choixRecommencer != 'N');
                 fclose(fichier);
             }
-            else{
+            else
+            {
                 strcpy(texteInfo, "INFO : Aucun labyrinthe n'a ete charge !");
             }
         }

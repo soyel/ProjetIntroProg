@@ -3,6 +3,12 @@
 #include <time.h>
 #include <string.h>
 
+#ifdef __WIN32__
+    #define clear() system("cls")
+#else
+    #define clear() system("clear")
+#endif
+
 #include "jeu.h"
 #include "affichage.h"
 
@@ -10,8 +16,10 @@ int positionActuelle_X = 1;
 int positionActuelle_Y = 0;
 
 
-int verifier_possibilite(char *laby, size_t nbColonnes, int x, int y){
-    if(laby[nbColonnes * (positionActuelle_X + x) + (positionActuelle_Y + y)]!='#'){
+int verifier_possibilite(char *laby, size_t nbColonnes, int x, int y)
+{
+    if(laby[nbColonnes * (positionActuelle_X + x) + (positionActuelle_Y + y)]!='#')
+    {
         return 1;
     }
     return 0;
@@ -33,52 +41,60 @@ int verifier_bonus_malus(char *laby, size_t nbColonnes, int x, int y)
     }
 }
 
-void deplacerAdroite(char *laby, size_t nbLignes, size_t nbColonnes, int *score){
+void deplacerAdroite(char *laby, size_t nbLignes, size_t nbColonnes, int *score)
+{
     if(verifier_possibilite(laby, nbColonnes, 0, 1) == 1){
         *score += 10 * verifier_bonus_malus(laby, nbColonnes, 0, 1);
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_Y +=1;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        system("CLS");
+        clear();
         afficher_labyrinthe(laby, nbLignes, nbColonnes, *score);
     }
     return;
 }
-void deplacerAgauche(char *laby, size_t nbLignes, size_t nbColonnes, int *score){
-    if(verifier_possibilite(laby, nbColonnes, 0, -1) == 1){
+void deplacerAgauche(char *laby, size_t nbLignes, size_t nbColonnes, int *score)
+{
+    if(verifier_possibilite(laby, nbColonnes, 0, -1) == 1)
+    {
         *score += 10 * verifier_bonus_malus(laby, nbColonnes, 0, -1);
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_Y -= 1;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        system("CLS");
+        clear();
         afficher_labyrinthe(laby, nbLignes, nbColonnes, *score);
     }
     return;
 }
-void deplacerEnHaut(char *laby, size_t nbLignes, size_t nbColonnes, int *score){
-    if(verifier_possibilite(laby, nbColonnes, -1, 0) == 1){
+void deplacerEnHaut(char *laby, size_t nbLignes, size_t nbColonnes, int *score)
+{
+    if(verifier_possibilite(laby, nbColonnes, -1, 0) == 1)
+    {
         *score +=  10 * verifier_bonus_malus(laby, nbColonnes, -1, 0);
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_X -= 1;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        system("CLS");
+        clear();
         afficher_labyrinthe(laby, nbLignes, nbColonnes, *score);
     }
     return;
 }
-void deplacerEnBas(char *laby, size_t nbLignes, size_t nbColonnes, int *score){
-    if(verifier_possibilite(laby, nbColonnes, 1, 0) == 1){
+void deplacerEnBas(char *laby, size_t nbLignes, size_t nbColonnes, int *score)
+{
+    if(verifier_possibilite(laby, nbColonnes, 1, 0) == 1)
+    {
         *score += 10 * verifier_bonus_malus(laby, nbColonnes, 1, 0);
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_X += 1;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        system("CLS");
+        clear();
         afficher_labyrinthe(laby, nbLignes, nbColonnes, *score);
     }
     return;
 }
 
-int verifier_position(size_t nbLignes, size_t nbColonnes){
+int verifier_position(size_t nbLignes, size_t nbColonnes)
+{
     if(positionActuelle_X == nbLignes - 2 && positionActuelle_Y == nbColonnes - 1){
         return 1;
     }
@@ -183,7 +199,8 @@ void enregistrer_topscore(int score, char *nomLaby)
             printf("\n\tBravo! Votre score va etre enregistre !\n");
             printf("\tEntrez votre nom : ");
             scanf("%s", scoreAenregistrer.nomJoueur);
-            itoa(scoreAenregistrer.score, chaineTemporaire, 10);
+            //itoa(scoreAenregistrer.score, chaineTemporaire, 10);
+            sprintf(chaineTemporaire, "%d", scoreAenregistrer.score);
             strcpy(ligneAinserer, scoreAenregistrer.nomJoueur);
             strcat(ligneAinserer, ":");
             strcat(ligneAinserer, chaineTemporaire);
@@ -205,7 +222,8 @@ void enregistrer_topscore(int score, char *nomLaby)
             {
                 memset(&ligneAinserer[0], 0, sizeof(ligneAinserer));
                 memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
-                itoa(tableauScore[i].score, chaineTemporaire, 10);
+                //itoa(tableauScore[i].score, chaineTemporaire, 10);
+                sprintf(chaineTemporaire, "%d", tableauScore[i].score);
                 strcpy(ligneAinserer, tableauScore[i].nomJoueur);
                 strcat(ligneAinserer, ":");
                 strcat(ligneAinserer, chaineTemporaire);
@@ -224,8 +242,9 @@ void enregistrer_topscore(int score, char *nomLaby)
         printf("Impossible d'ouvrir\n");
     }
 }
-void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe){
-    system("CLS");
+void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe)
+{
+    clear();
     laby[nbColonnes * 1 + 0] = 'o';
     int score = 0;
     int scoreTotal = 0;
@@ -235,9 +254,11 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe){
     fflush(stdin);
     time_t debut, fin;
     debut = time(NULL);
-    while(touche != 'f'){
+    while(touche != 'f')
+    {
         touche = getch();
-        switch(touche){
+        switch(touche)
+        {
             case 'd': deplacerAdroite(laby, nbLignes, nbColonnes, p_score);
                         break;
             case 'q': deplacerAgauche(laby, nbLignes, nbColonnes, p_score);
@@ -247,7 +268,8 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe){
             case 'z': deplacerEnHaut(laby, nbLignes, nbColonnes, p_score);
                         break;
         }
-        if(verifier_position(nbLignes, nbColonnes)==1){
+        if(verifier_position(nbLignes, nbColonnes)==1)
+        {
             fin = time(NULL);
             int tempsPartie = (int)difftime(fin, debut);
             printf("\tMalus de temps : %d\n", tempsPartie / 2);
