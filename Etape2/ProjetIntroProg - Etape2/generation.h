@@ -25,10 +25,9 @@ struct cellule
 
 typedef cellule* chemin;
 
-
-void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes);
-void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin);
 chemin initialiserChemin(int id, int x, int y);
+void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin);
+void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes);
 void remplir_labyrinthe(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonnes);
 
 #endif // GENERATION_H_INCLUDED

@@ -18,7 +18,6 @@ int main(void)
     int choix_utilisateur;
 
     srand(time(NULL));
-
     choix_utilisateur = afficher_accueil();
     if(choix_utilisateur==0)
     {

@@ -7,18 +7,14 @@ typedef struct
     int score;
 } scoreJoueur;
 
-void verifier_position_score(scoreJoueur* tab, int *nbScore, scoreJoueur scoreAenregistrer);
-void enregistrer_topscore(int score, char *nomLaby);
-void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe);
-
-void deplacerAdroite(char *laby, size_t nbLignes, size_t nbColonnes, int *score);
-void deplacerAgauche(char *laby, size_t nbLignes, size_t nbColonnes, int *score);
-void deplacerEnHaut(char *laby, size_t nbLignes, size_t nbColonnes, int *score);
-void deplacerEnBas(char *laby, size_t nbLignes, size_t nbColonnes, int *score);
-
 int verifier_possibilite(char *laby, size_t nbColonnes, int x, int y);
 int verifier_bonus_malus(char *laby, size_t nbColonnes, int x, int y);
-int verifier_position(size_t nbLignes, size_t nbColonnes);
+int verifier_position_gagnante(size_t nbLignes, size_t nbColonnes);
 
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score);
+
+void verifier_position_score(scoreJoueur* tab, int *nbScore, scoreJoueur scoreAenregistrer);
+void enregistrer_topscore(int score, char *nomLaby);
+void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, int avecClassement);
 
 #endif // JEU_H_INCLUDED

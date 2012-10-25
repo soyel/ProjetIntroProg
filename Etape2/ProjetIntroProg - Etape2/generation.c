@@ -3,6 +3,13 @@
 
 #include "generation.h"
 
+/**
+ * Initialise chaque cellule comme un début de chemin
+ * @param id identifiant de la cellule
+ * @param x abscisse de la cellule
+ * @param y ordonnée de la cellule
+ * @return la cellule comme un chemin
+ */
 chemin initialiserChemin(int id, int x, int y)
 {
     cellule* nouvelleCellule = malloc(sizeof(cellule));
@@ -17,31 +24,12 @@ chemin initialiserChemin(int id, int x, int y)
     return nouvelleCellule;
 }
 
-chemin ajouterEnfinAvecValeurs(chemin leChemin, int x, int y)
-{
-
-    cellule* nouvelleCellule = malloc(sizeof(cellule));
-
-    nouvelleCellule->x = x;
-    nouvelleCellule->y = y;
-    nouvelleCellule->celluleSuivante = NULL;
-
-    if(leChemin == NULL)
-    {
-        return nouvelleCellule;
-    }
-    else
-    {
-        cellule* tempCellule = leChemin;
-        while(tempCellule->celluleSuivante != NULL)
-        {
-            tempCellule = tempCellule->celluleSuivante;
-        }
-        tempCellule->celluleSuivante = nouvelleCellule;
-        return leChemin;
-    }
-
-}
+/**
+ * Ajoute leChemin, qui peut être une cellule ou un chemin de cellule,
+ * à la fin du chemin lesChemins
+ * @param lesChemins le chemin principal principal d'une ou plusieurs cellules
+ * @param leChemin le chemin à ajouter
+ */
 void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin)
 {
     cellule* temp = lesChemins;
@@ -53,30 +41,21 @@ void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin)
     return;
 }
 
-void remplir_labyrinthe(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonnes)
-{
-    char caractereLu;
-    size_t i, j;
-    for(i=0; i<nbLignes; i++)
-    {
-        for(j=0; j<nbColonnes; j++)
-        {
-            do
-            {
-                 caractereLu = fgetc(fichier);
-            }while(caractereLu == '\n');
-            laby[nbColonnes * i + j] = caractereLu;
-        }
-    }
-    return;
-}
-
+/**
+ * Genère un labyrinthe de nbLignes lignes et nbColonnes colonnes
+ * @param laby le labyrinthe vide
+ * @param nbLignes le nombre de lignes du labyrinthe
+ * @param nbColonnes le nombre de colonnes du labyrinthe
+ */
 void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
 {
     int compteurCell = 1;
     int compteurMur = 1;
     int nbMurs = ((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/2;
-    size_t i, j;
+
+    size_t i;
+    size_t j;
+
     chemin tabDesChemins[nbLignes][nbColonnes];
     struct coordonneesMurs mesMurs[nbMurs];
 
@@ -130,6 +109,7 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     int coordXSecCell, coordYSecCell;
     int idPremCell, idSecCell;
     int cellDominante, cell1, cell2;
+
     cellule* cellule1 = NULL;
     cellule* cellule2 = NULL;
     cellule* tmpDebutChemin = NULL;
@@ -204,7 +184,6 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     /*int nbMalusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;
     int nbBonusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;*/
 
-
     int compteurCelluleVide = 0;
     int celluleAleatoire;
     int typeBonusMalus;
@@ -224,7 +203,6 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
 
         }
     }
-    //printf("compteurCelluleVide : %d\n", compteurCelluleVide);
 
     while(compteurCelluleVide > 0)
     {
@@ -233,12 +211,10 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         if(typeBonusMalus == 1)
         {
             bonusMalus = 'm';
-            //nbMalusAdistribuer -= 1;
         }
         else
         {
             bonusMalus = 'b';
-            //nbBonusAdistribuer -= 1;
         }
         typeBonusMalus = rand()%20;
         if(typeBonusMalus >=0 && typeBonusMalus <= 3)
@@ -246,7 +222,6 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
             laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
         }
 
-        //laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
 
         toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
         toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
