@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="affichage.c" open="1" top="0" tabpos="2">
-		<Cursor position="540" topLine="294" />
+	<File name="affichage.c" open="0" top="0" tabpos="2">
+		<Cursor position="11587" topLine="250" />
 	</File>
-	<File name="affichage.h" open="1" top="0" tabpos="5">
+	<File name="affichage.h" open="1" top="0" tabpos="4">
 		<Cursor position="184" topLine="0" />
 	</File>
-	<File name="generation.c" open="0" top="0" tabpos="2">
+	<File name="generation.c" open="1" top="0" tabpos="6">
 		<Cursor position="1126" topLine="2" />
 	</File>
-	<File name="generation.h" open="1" top="0" tabpos="3">
+	<File name="generation.h" open="1" top="1" tabpos="2">
 		<Cursor position="364" topLine="0" />
 	</File>
-	<File name="jeu.c" open="1" top="0" tabpos="4">
-		<Cursor position="25398" topLine="582" />
+	<File name="gestion_fichiers.c" open="1" top="0" tabpos="7">
+		<Cursor position="443" topLine="0" />
 	</File>
-	<File name="jeu.h" open="1" top="0" tabpos="6">
+	<File name="getch_tool.c" open="1" top="0" tabpos="8">
+		<Cursor position="559" topLine="0" />
+	</File>
+	<File name="jeu.c" open="1" top="0" tabpos="3">
+		<Cursor position="194" topLine="0" />
+	</File>
+	<File name="jeu.h" open="1" top="0" tabpos="5">
 		<Cursor position="468" topLine="0" />
 	</File>
-	<File name="main.c" open="1" top="1" tabpos="1">
-		<Cursor position="0" topLine="0" />
+	<File name="main.c" open="1" top="0" tabpos="1">
+		<Cursor position="240" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

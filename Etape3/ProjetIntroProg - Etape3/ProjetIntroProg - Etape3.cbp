@@ -43,6 +43,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="gestion_fichiers.h" />
+		<Unit filename="getch_tool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="getch_tool.h" />
 		<Unit filename="jeu.c">
 			<Option compilerVar="CC" />
 		</Unit>
