@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="affichage.c" open="1" top="1" tabpos="3">
+		<Cursor position="11359" topLine="288" />
+	</File>
+	<File name="affichage.h" open="1" top="0" tabpos="6">
+		<Cursor position="184" topLine="0" />
+	</File>
+	<File name="generation.c" open="0" top="0" tabpos="2">
+		<Cursor position="1126" topLine="2" />
+	</File>
+	<File name="generation.h" open="1" top="0" tabpos="4">
+		<Cursor position="364" topLine="0" />
+	</File>
+	<File name="jeu.c" open="1" top="0" tabpos="5">
+		<Cursor position="24741" topLine="594" />
+	</File>
+	<File name="jeu.h" open="1" top="0" tabpos="7">
+		<Cursor position="468" topLine="0" />
+	</File>
+	<File name="main.c" open="1" top="0" tabpos="2">
+		<Cursor position="0" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

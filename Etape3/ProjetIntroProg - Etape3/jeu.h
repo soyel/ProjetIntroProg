@@ -11,7 +11,7 @@ int verifier_possibilite(char *laby, size_t nbColonnes, int x, int y);
 int verifier_bonus_malus(char *laby, size_t nbColonnes, int x, int y);
 int verifier_position_gagnante(size_t nbLignes, size_t nbColonnes);
 
-void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score);
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe);
 
 void verifier_position_score(scoreJoueur* tab, int *nbScore, scoreJoueur scoreAenregistrer);
 void enregistrer_topscore(int score, char *nomLaby);

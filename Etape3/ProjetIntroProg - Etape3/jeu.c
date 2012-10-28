@@ -4,8 +4,10 @@
 #include <string.h>
 
 #ifdef __WIN32__
+    #include <conio.h>
     #define clear() system("cls")
 #else
+    #include "getch_tool.h"
     #define clear() system("clear")
 #endif
 
@@ -108,7 +110,7 @@ void verifier_position_score(scoreJoueur* tableauScores, int *nbScore, scoreJoue
  * @param directionY l'ordonnée de la direction
  * @param score le score du joueur
  */
-void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score)
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe)
 {
     //if(verifier_possibilite(laby, nbColonnes, 1, 0) == 1)
     if(verifier_possibilite(laby, nbColonnes, directionX, directionY) == 1)
@@ -119,7 +121,7 @@ void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, in
         positionActuelle_Y += directionY;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
         clear();
-        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score);
+        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe);
     }
     return;
 }
@@ -377,7 +379,6 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
                 direction_y = 1;
             }
         }
-        //_getch();
     }
 
     int i;
@@ -596,7 +597,7 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
     time_t debut = time(NULL);
     time_t fin;
 
-    afficher_labyrinthe(laby, nbLignes, nbColonnes, score);
+    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe);
 
     fflush(stdin);
     while(touche != 'f')
@@ -604,13 +605,13 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
         touche = getch();
         switch(touche)
         {
-            case 'd': deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score);
+            case 'd': deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe);
                         break;
-            case 'q': deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score);
+            case 'q': deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe);
                         break;
-            case 's': deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score);
+            case 's': deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe);
                         break;
-            case 'z': deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score);
+            case 'z': deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe);
                         break;
             case 'i': trouver_chemin_de_sortie(laby, nbLignes, nbColonnes);
                         touche = 'f';

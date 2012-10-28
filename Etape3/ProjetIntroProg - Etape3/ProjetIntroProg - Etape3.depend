@@ -1,45 +1,56 @@
 # depslib dependency file v1.0
-1351190240 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\gestion_fichiers.c
+1351186640 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\gestion_fichiers.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"gestion_fichiers.h"
 
-1351190344 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\gestion_fichiers.h
+1351186744 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\gestion_fichiers.h
 
-1351307701 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.c
+1351390649 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.c
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
 	<string.h>
+	<conio.h>
+	"getch_tool.h"
 	"jeu.h"
 	"affichage.h"
 
-1351191927 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.h
+1351329895 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.h
 
-1351191614 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.h
+1351329834 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.h
 
-1351171748 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\main.c
+1351391537 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\main.c
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
 	"affichage.h"
 
-1351306826 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.c
+1351391241 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	<windows.h>
 	<dirent.h>
 	"generation.h"
 	"affichage.h"
 	"gestion_fichiers.h"
 	"jeu.h"
+	<windows.h>
+	<conio.h>
+	<unistd.h>
+	"getch_tool.h"
 
-1351303197 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.h
+1351299597 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.h
 
-1351306362 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.c
+1351302762 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.c
 	<stdio.h>
 	<stdlib.h>
 	"generation.h"
+
+1351390831 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\getch_tool.c
+	<termios.h>
+	<stdio.h>
+
+1351390513 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\getch_tool.h
 

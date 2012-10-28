@@ -13,7 +13,7 @@ void vider_buffer(void)
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int choix_utilisateur;
 

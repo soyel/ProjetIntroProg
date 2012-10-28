@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 #include <dirent.h>
 
 #include "generation.h"
@@ -10,21 +9,27 @@
 #include "jeu.h"
 
 #ifdef __WIN32__
+    #include <windows.h>
+    #include <conio.h>
+    #define dormir(SEC) Sleep(SEC)
     #define clear() system("cls")
 #else
+    #include "getch_tool.h"
+    #define dormir(SEC) sleep(SEC)
     #define clear() system("clear")
 #endif
 
 /**
  * Affiche le labyrinthe laby
- * @param laby le labyrinthe à afficher
+ * @param laby le labyrinthe a afficher
  * @param nbLignes le nombre de lignes du labyrinthe
  * @param nbColonnes le nombre de colonnes du labyrinthe
- * @param score le score à afficher
+ * @param score le score a afficher
  */
-void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score)
+void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score, char *nomLaby)
 {
     printf("\n--NOUVELLE PARTIE-----------------------------------------------------------\n\n");
+    printf("\t%s\n\n", nomLaby);
     size_t i, j;
     for(i = 0; i < nbLignes; i++)
     {
@@ -35,7 +40,7 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
         }
         printf("\n");
     }
-    printf("\n\  [AIDE]:\n");
+    printf("\n\040\040[AIDE]:\n");
     printf("\t'f' pour quitter la partie\n");
     printf("\t'i' pour tracer la solution du labyrinthe (mettra fin a la partie)\n\n");
     printf("--RESULTATS-----------------------------------------------------------------\n\n");
@@ -45,7 +50,7 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
 
 /**
  * Affiche le menu d'accueil
- * @return 1 si le joueur décide de jouer, 0 sinon
+ * @return 1 si le joueur decide de jouer, 0 sinon
  */
 int afficher_accueil()
 {
@@ -147,12 +152,12 @@ void afficher_menu()
                 remplir_fichier(fichier, &(laby[0][0]), N, M);
 
                 printf("\n---------------------------------------------------------------------------\n");
-                printf("INFO : Le labyrinthe a ete cree avec succes\n");
-                printf("\n\tLa partie va demarrer dans quelques instants... ");
+                printf("INFO : Le labyrinthe a ete cree avec succes");
+                printf("\n\n\tLa partie va demarrer dans quelques instants... ");
                 for(i = 3; i >= 1; i--)
                 {
                     printf("%d  ", i);
-                    Sleep(1000);
+                    dormir(1000);
                 }
                 jouer(&(laby[0][0]), N, M, nomLaby, 0);
                 fclose(fichier);
@@ -184,7 +189,7 @@ void afficher_menu()
                         for(i = 3; i >= 1; i--)
                         {
                             printf("%d  ", i);
-                            Sleep(1000);
+                            dormir(1000);
                         }
 
                         jouer(&(laby[0][0]), N, M, nomLaby, 0);
@@ -198,7 +203,7 @@ void afficher_menu()
                     else
                     {
                         printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
-                        Sleep(2500);
+                        dormir(2500);
                         choixRecommencer = 'N';
                     }
                 }
@@ -206,7 +211,7 @@ void afficher_menu()
             else
             {
                 printf("\n\tAttention : Impossible de creer le fichier\n");
-                Sleep(2500);
+                dormir(2500);
             }
         }
         else if(choix_menu == 2)
@@ -275,7 +280,7 @@ void afficher_menu()
                         for(i = 3; i >= 1; i--)
                         {
                             printf("%d  ", i);
-                            Sleep(1000);
+                            dormir(1000);
                         }
 
                         jouer(&(laby[0][0]), N, M, nomLaby, 0);
@@ -289,7 +294,7 @@ void afficher_menu()
                     else
                     {
                         printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
-                        Sleep(2500);
+                        dormir(2500);
                         choixRecommencer = 'N';
                     }
                 }
@@ -310,9 +315,9 @@ void afficher_menu()
                 for(i = 3; i >= 1; i--)
                 {
                     printf("%d  ", i);
-                    Sleep(1000);
+                    dormir(1000);
                 }
-                jouer(&(laby[0][0]), N, M, "par_defaut", 1);
+                jouer(&(laby[0][0]), N, M, "Par defaut", 1);
                 printf("\nVoulez-vous recommencer ? (O/N) : ");
                 fflush(stdin);
                 scanf("%c", &choixRecommencer);
