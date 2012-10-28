@@ -17,7 +17,7 @@
 	"jeu.h"
 	"affichage.h"
 
-1351329895 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.h
+1351430339 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\jeu.h
 
 1351329834 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.h
 
@@ -27,7 +27,7 @@
 	<time.h>
 	"affichage.h"
 
-1351391241 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.c
+1351393514 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\affichage.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -38,10 +38,9 @@
 	"jeu.h"
 	<windows.h>
 	<conio.h>
-	<unistd.h>
 	"getch_tool.h"
 
-1351299597 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.h
+1351430331 g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.h
 
 1351302762 source:g:\downloads\projetintroprog\etape3\projetintroprog - etape3\generation.c
 	<stdio.h>
