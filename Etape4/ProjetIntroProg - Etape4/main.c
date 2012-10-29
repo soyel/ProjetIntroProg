@@ -7,7 +7,9 @@
 
 typedef struct
 {
-    char texte[31]; // on autorise un nom de 23 caractère
+    char nomL[31]; // on autorise un nom de 23 caractère
+    char nbLignes[3];
+    char nbColonnes[3];
     int enSaisie;
     int indice;
 } Saisie;
@@ -19,11 +21,13 @@ typedef struct
     SDL_Surface *labelNomLaby;
     SDL_Surface *labelNbLignes;
     SDL_Surface *labelNbColonnes;
+    SDL_Surface *pointeurEntree;
     SDL_Rect positionImageDeFond2;
     SDL_Rect positionRetourMenu;
     SDL_Rect positionLabelNomLaby;
     SDL_Rect positionLabelNbLignes;
     SDL_Rect positionLabelNbColonnes;
+    SDL_Rect positionPointeurEntree;
 } InterfaceCreationLaby;
 
 struct coordonnees
@@ -57,10 +61,10 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes);
 void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, SDL_Surface *ecran);
 void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes, SDL_Surface *ecran);
 void initSaisie(Saisie *saisie);
-void saisirCaractere(Saisie *saisie, char caractere);
-void finSaisie(Saisie *saisie);
-Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby);
-char *recuperer_partie_texte(Saisie saisie);
+void saisirCaractere(Saisie *saisie, char caractere, int positionEntree);
+void finSaisie(Saisie *saisie, int positionEntree);
+Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby, int *entreesV);
+char *recuperer_partie_texte(Saisie saisie, int positionEntree);
 void effacerCaractere(Saisie *saisie);
 
 int main(int argc, char *argv[])
@@ -84,11 +88,11 @@ int main(int argc, char *argv[])
     SDL_Rect positionRetourMenu;
 
 
-    positionBoutonJouer.x = 260;
-    positionBoutonJouer.y = 250;
+    positionBoutonJouer.x = 360;
+    positionBoutonJouer.y = 450;
 
-    positionBoutonQuitter.x = 400;
-    positionBoutonQuitter.y = 250;
+    positionBoutonQuitter.x = 615;
+    positionBoutonQuitter.y = 450;
 
     positionRetourMenu.x = 550;
     positionRetourMenu.y = 8;
@@ -127,10 +131,10 @@ int main(int argc, char *argv[])
     SDL_Color couleurBlanche = {255, 255, 255} ;
 
     SDL_WM_SetIcon(SDL_LoadBMP("laby.bmp"), NULL); //icone
-    ecran = SDL_SetVideoMode(800, 400, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); // Ouverture de la fenêtre
+    ecran = SDL_SetVideoMode(1100, 700, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); // Ouverture de la fenêtre
     SDL_WM_SetCaption("LA'WARA", NULL); //titre
 
-    imageDeFond = SDL_LoadBMP("bg.bmp");
+    imageDeFond = IMG_Load("bg.png");
     SDL_BlitSurface(imageDeFond, NULL, ecran, &positionFond);
 
     retourMenu = IMG_Load("retourMenu.png");
@@ -180,8 +184,8 @@ int main(int argc, char *argv[])
                         afficher_titre_menu(ecran);
 
                         fleche = IMG_Load("fleche.png");
-                        positionFleche.x = 50;
-                        positionFleche.y = 93;
+                        positionFleche.x = 210;
+                        positionFleche.y = 220;
 
                         SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
                         SDL_Flip(ecran);
@@ -202,37 +206,7 @@ int main(int argc, char *argv[])
                                             break;
                                     }
                                 case SDL_MOUSEMOTION:
-                                    if(event.motion.x >= 150 && event.motion.x <= 694 && event.motion.y >= 100 && event.motion.y <= 140)
-                                    {
-                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
-
-                                        afficher_titre_menu(ecran);
-                                        positionFleche.y = 100;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
-
-                                        SDL_Flip(ecran);
-                                    }
-                                    if(event.motion.x >= 150 && event.motion.x <= 694 && event.motion.y >= 140 && event.motion.y <= 180)
-                                    {
-                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
-
-                                        afficher_titre_menu(ecran);
-                                        positionFleche.y = 140;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
-
-                                        SDL_Flip(ecran);
-                                    }
-                                    if(event.motion.x >= 150 && event.motion.x <= 694 && event.motion.y >= 180 && event.motion.y <= 220)
-                                    {
-                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
-
-                                        afficher_titre_menu(ecran);
-                                        positionFleche.y = 180;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
-
-                                        SDL_Flip(ecran);
-                                    }
-                                    if(event.motion.x >= 150 && event.motion.x <= 694 && event.motion.y >= 220 && event.motion.y <= 260)
+                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 220 && event.motion.y <= 280)
                                     {
                                         SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
 
@@ -242,12 +216,42 @@ int main(int argc, char *argv[])
 
                                         SDL_Flip(ecran);
                                     }
-                                    if(event.motion.x >= 150 && event.motion.x <= 694 && event.motion.y >= 260 && event.motion.y <= 300)
+                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 280 && event.motion.y <= 340)
                                     {
                                         SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
 
                                         afficher_titre_menu(ecran);
-                                        positionFleche.y = 260;
+                                        positionFleche.y = 280;
+                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+
+                                        SDL_Flip(ecran);
+                                    }
+                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 340 && event.motion.y <= 400)
+                                    {
+                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
+
+                                        afficher_titre_menu(ecran);
+                                        positionFleche.y = 340;
+                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+
+                                        SDL_Flip(ecran);
+                                    }
+                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 400 && event.motion.y <= 460)
+                                    {
+                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
+
+                                        afficher_titre_menu(ecran);
+                                        positionFleche.y = 400;
+                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+
+                                        SDL_Flip(ecran);
+                                    }
+                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 460 && event.motion.y <= 520)
+                                    {
+                                        SDL_BlitSurface(imageDeFond2, NULL, ecran, &positionFond2);
+
+                                        afficher_titre_menu(ecran);
+                                        positionFleche.y = 460;
                                         SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
 
                                         SDL_Flip(ecran);
@@ -255,7 +259,7 @@ int main(int argc, char *argv[])
                                 case SDL_MOUSEBUTTONUP:
                                     if (event.button.button == SDL_BUTTON_LEFT)
                                     {
-                                        if(event.button.x > 150 && event.button.x < 694 && event.button.y > 100 && event.button.y < 140)
+                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 220 && event.button.y < 280)
                                         {
                                             InterfaceCreationLaby iCreationLaby;
                                             iCreationLaby.imageDeFond2 = imageDeFond2;
@@ -263,17 +267,25 @@ int main(int argc, char *argv[])
                                             iCreationLaby.labelNomLaby = IMG_Load("labelNom.png");
                                             iCreationLaby.labelNbLignes = IMG_Load("labelNbLignes.png");
                                             iCreationLaby.labelNbColonnes = IMG_Load("labelNbColonnes.png");
+                                            iCreationLaby.pointeurEntree = IMG_Load("pointeur.png");
+
                                             iCreationLaby.positionImageDeFond2 = positionFond2;
                                             iCreationLaby.positionRetourMenu = positionRetourMenu;
 
-                                            iCreationLaby.positionLabelNomLaby.x = 20;
-                                            iCreationLaby.positionLabelNomLaby.y = 120;
+                                            iCreationLaby.positionLabelNomLaby.x = 150;
+                                            iCreationLaby.positionLabelNomLaby.y = 220;
 
-                                            iCreationLaby.positionLabelNbLignes.x = 20;
-                                            iCreationLaby.positionLabelNbLignes.y = 160;
+                                            iCreationLaby.positionLabelNbLignes.x = 150;
+                                            iCreationLaby.positionLabelNbLignes.y = 300;
 
-                                            iCreationLaby.positionLabelNbColonnes.x = 20;
-                                            iCreationLaby.positionLabelNbColonnes.y = 200;
+                                            iCreationLaby.positionLabelNbColonnes.x = 150;
+                                            iCreationLaby.positionLabelNbColonnes.y = 380;
+
+                                            iCreationLaby.positionPointeurEntree.x = 500;
+                                            iCreationLaby.positionPointeurEntree.y = 225;
+
+                                            int entreeValidees = 1;
+                                            int *p_entreeV = &entreeValidees;
 
                                             FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
                                             SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
@@ -281,17 +293,22 @@ int main(int argc, char *argv[])
                                             SDL_BlitSurface(iCreationLaby.labelNomLaby, NULL, ecran, &iCreationLaby.positionLabelNomLaby);
                                             SDL_BlitSurface(iCreationLaby.labelNbLignes, NULL, ecran, &iCreationLaby.positionLabelNbLignes);
                                             SDL_BlitSurface(iCreationLaby.labelNbColonnes, NULL, ecran, &iCreationLaby.positionLabelNbColonnes);
+                                            SDL_BlitSurface(iCreationLaby.pointeurEntree, NULL, ecran, &iCreationLaby.positionPointeurEntree);
                                             Saisie maSaisie;
                                             SDL_Flip(ecran);
-                                            maSaisie = recuperer_entree(ecran, iCreationLaby);
+                                            do
+                                            {
+                                                maSaisie = recuperer_entree(ecran, iCreationLaby, p_entreeV);
+                                            }
+                                            while(entreeValidees < 4);
 
                                         }
-                                        if(event.button.x > 150 && event.button.x < 694 && event.button.y > 260 && event.button.y < 300 )
+                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 460 && event.button.y < 520 )
                                         { //si on click gauche sur 'quitter'
                                             FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
                                             continuer = 0;
                                         }
-                                        if(event.button.x > 150 && event.button.x < 694 && event.button.y > 180 && event.button.y < 220)
+                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 340 && event.button.y < 400)
                                         {
                                             FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
                                             char laby [9][23];
@@ -386,32 +403,32 @@ void afficher_titre_menu(SDL_Surface *ecran)
 
     SDL_BlitSurface(titre, NULL, ecran, &positionTitre);
     creerPartie = IMG_Load("creerLaby.png");
-    positionCreerPartie.x = 150;
-    positionCreerPartie.y = 100;
+    positionCreerPartie.x = 300;
+    positionCreerPartie.y = 220;
 
     SDL_BlitSurface(creerPartie, NULL, ecran, &positionCreerPartie);
 
     chargerPartie = IMG_Load("chargerLaby.png");
-    positionChargerPartie.x = 150;
-    positionChargerPartie.y = 140;
+    positionChargerPartie.x = 300;
+    positionChargerPartie.y = 280;
 
     SDL_BlitSurface(chargerPartie, NULL, ecran, &positionChargerPartie);
 
     jouerClassement = IMG_Load("jouerClassement.png");
-    positionJouerClassement.x = 150;
-    positionJouerClassement.y = 180;
+    positionJouerClassement.x = 300;
+    positionJouerClassement.y = 340;
 
     SDL_BlitSurface(jouerClassement, NULL, ecran, &positionJouerClassement);
 
     trouverSolution = IMG_Load("afficherSolution.png");
-    positionTrouverSolution.x = 150;
-    positionTrouverSolution.y = 220;
+    positionTrouverSolution.x = 300;
+    positionTrouverSolution.y = 400;
 
     SDL_BlitSurface(trouverSolution, NULL, ecran, &positionTrouverSolution);
 
     quitterJeu = IMG_Load("quitterJeu.png");
-    positionQuitterJeu.x = 150;
-    positionQuitterJeu.y = 260;
+    positionQuitterJeu.x = 300;
+    positionQuitterJeu.y = 460;
 
     SDL_BlitSurface(quitterJeu, NULL, ecran, &positionQuitterJeu);
 
@@ -988,7 +1005,7 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes, SD
     afficher_labyrinthe(laby, nbLignes, nbColonnes, ecran);
 }
 
-Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
+Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby, int *entreesV)
 {
     SDL_Event eventSaisie;
 
@@ -996,20 +1013,34 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
     Saisie *p_saisie = &saisie;
     initSaisie(p_saisie);
     int continuerSaisie = 1;
-    SDL_Surface *texte;
-    SDL_Rect positionTexte;
+    int positionEntree = 1;
+    SDL_Surface *nomLaby;
+    SDL_Surface *nbL;
+    SDL_Surface *nbC;
+    SDL_Rect positionNomLaby;
+    positionNomLaby.x = 535;
+    positionNomLaby.y = 225;
+
+    SDL_Rect positionNbL;
+    positionNbL.x = 535;
+    positionNbL.y = 305;
+
+    SDL_Rect positionNbC;
+    positionNbC.x = 535;
+    positionNbC.y = 385;
 
     TTF_Init();
-    positionTexte.x = 375;
-    positionTexte.y = 125;
     SDL_Color couleurBlanche = {255, 255, 255};
 
     TTF_Font *police = NULL;
     police = TTF_OpenFont("times.ttf", 24);
+    nomLaby = TTF_RenderText_Blended(police, "", couleurBlanche);
+    nbL = TTF_RenderText_Blended(police, "", couleurBlanche);
+    nbC = TTF_RenderText_Blended(police, "", couleurBlanche);
 
     char caractereAinverser = '-';
 
-    while (continuerSaisie) /* TANT QUE la variable ne vaut pas 0 */
+    while (continuerSaisie && *entreesV < 4) /* TANT QUE la variable ne vaut pas 0 */
     {
         SDL_WaitEvent(&eventSaisie); /* On attend un événement qu'on récupère dans event */
         switch(eventSaisie.type) /* On teste le type d'événement */
@@ -1030,25 +1061,46 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
             case SDL_KEYDOWN:
                 switch ( eventSaisie.key.keysym.sym ) // on teste quelle touche a été enfoncée
                 {
+                    char *chaineT;
                     case SDLK_a:
                         caractereAinverser = 'q';
-                        saisirCaractere(p_saisie, caractereAinverser);
+                        saisirCaractere(p_saisie, caractereAinverser, *entreesV);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         break;
                     case SDLK_w:
                         caractereAinverser = 'z';
-                        saisirCaractere(p_saisie, caractereAinverser);
+                        saisirCaractere(p_saisie, caractereAinverser, *entreesV);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         break;
                     case SDLK_z:
                         caractereAinverser = 'w';
-                        saisirCaractere(p_saisie, caractereAinverser);
+                        saisirCaractere(p_saisie, caractereAinverser, *entreesV);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         break;
                     case SDLK_q:
                         caractereAinverser = 'a';
-                        saisirCaractere(p_saisie, caractereAinverser);
+                        saisirCaractere(p_saisie, caractereAinverser, *entreesV);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         break;
                     case SDLK_SEMICOLON:
                         caractereAinverser = 'm';
-                        saisirCaractere(p_saisie, caractereAinverser);
+                        saisirCaractere(p_saisie, caractereAinverser, *entreesV);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         break;
                     case SDLK_b:
                     case SDLK_c:
@@ -1074,29 +1126,45 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
                     case SDLK_y:
                         if (saisie.enSaisie == 1)
                         {
-                            saisirCaractere(p_saisie, (char)eventSaisie.key.keysym.sym);
-                        }  // si on est en train de saisir du texte
+                            saisirCaractere(p_saisie, (char)eventSaisie.key.keysym.sym, *entreesV);
+                            chaineT = recuperer_partie_texte(saisie, *entreesV);
+                            if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                            if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                            if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
                         break;  // le break de tous les case SDLK_*
 
                     case SDLK_RETURN:  // pour la fin de la saisie
-                        finSaisie(p_saisie);
-                        continuerSaisie = 0;
+                        *entreesV += 1;
+                        iCreationLaby.positionPointeurEntree.y += 80;
+                        finSaisie(p_saisie, *entreesV);
+                        if(*entreesV > 3)
+                        {
+                            saisie.enSaisie = 0; // on ne saisie plus
+                            continuerSaisie = 0;
+                        }
                         break;
                     case SDLK_BACKSPACE:
                         effacerCaractere(p_saisie);
+                        chaineT = recuperer_partie_texte(saisie, *entreesV);
+                        if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
 
                 }
-                char *chaineT;
-                chaineT = recuperer_partie_texte(saisie);
-                texte = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
-
-                SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
-                SDL_BlitSurface(iCreationLaby.retourMenu, NULL, ecran, &iCreationLaby.positionRetourMenu);
-                SDL_BlitSurface(iCreationLaby.labelNomLaby, NULL, ecran, &iCreationLaby.positionLabelNomLaby);
-                SDL_BlitSurface(iCreationLaby.labelNbLignes, NULL, ecran, &iCreationLaby.positionLabelNbLignes);
-                SDL_BlitSurface(iCreationLaby.labelNbColonnes, NULL, ecran, &iCreationLaby.positionLabelNbColonnes);
-                SDL_BlitSurface(texte, NULL, ecran, &positionTexte);
-                SDL_Flip(ecran);
+                if (*entreesV < 4)
+                {
+                    SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+                    SDL_BlitSurface(iCreationLaby.retourMenu, NULL, ecran, &iCreationLaby.positionRetourMenu);
+                    SDL_BlitSurface(iCreationLaby.labelNomLaby, NULL, ecran, &iCreationLaby.positionLabelNomLaby);
+                    SDL_BlitSurface(iCreationLaby.labelNbLignes, NULL, ecran, &iCreationLaby.positionLabelNbLignes);
+                    SDL_BlitSurface(iCreationLaby.labelNbColonnes, NULL, ecran, &iCreationLaby.positionLabelNbColonnes);
+                    SDL_BlitSurface(iCreationLaby.pointeurEntree, NULL, ecran, &iCreationLaby.positionPointeurEntree);
+                    SDL_BlitSurface(nomLaby, NULL, ecran, &positionNomLaby);
+                    SDL_BlitSurface(nbL, NULL, ecran, &positionNbL);
+                    SDL_BlitSurface(nbC, NULL, ecran, &positionNbC);
+                    SDL_Flip(ecran);
+                }
                 break; // le break du case SDL_KEYDOWN
         }
 
@@ -1109,36 +1177,61 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
 
 void initSaisie(Saisie *saisie)
 {
-        saisie->enSaisie = 1;  // pour dire que l'on est en train de saisir
+    saisie->enSaisie = 1;  // pour dire que l'on est en train de saisir
     saisie->indice = 0; // on en est au premier caractère.
 }
 
-void saisirCaractere(Saisie *saisie, char caractere)
+void saisirCaractere(Saisie *saisie, char caractere, int positionEntree)
 {
-    if (saisie->indice < 31) // s'il reste encore de la place dans le tableau
+    int index = saisie->indice;
+
+    if(positionEntree == 1)
     {
-        int index = saisie->indice;
-        char *texte;
-        texte = saisie->texte;
-        saisie->texte[saisie->indice] = caractere;
-        saisie->indice = saisie->indice + 1;
+        if(index < 31)
+        {
+            saisie->nomL[saisie->indice] = caractere;
+            saisie->indice = saisie->indice + 1;
+        }
     }
+    if(positionEntree == 2)
+    {
+        if(index < 2)
+        {
+            saisie->nbLignes[saisie->indice] = caractere;
+            saisie->indice = saisie->indice + 1;
+        }
+    }
+    if(positionEntree == 3)
+    {
+        if(index < 2)
+        {
+            saisie->nbColonnes[saisie->indice] = caractere;
+            saisie->indice = saisie->indice + 1;
+        }
+    }
+
 }
 
 void effacerCaractere(Saisie *saisie)
 {
     if(saisie->indice != 0)
     {
+        /*if(positionEntree == 1) saisie->nomL[saisie->indice] = 0; // le 0 terminal
+        if(positionEntree == 2) saisie->nbLignes[saisie->indice] = 0; // le 0 terminal
+        if(positionEntree == 3) saisie->nbColonnes[saisie->indice] = 0; // le 0 terminal*/
         saisie->indice = saisie->indice - 1;
     }
 }
-void finSaisie(Saisie *saisie)
+void finSaisie(Saisie *saisie, int positionEntree)
 {
-    saisie->texte[saisie->indice] = 0; // le 0 terminal
-    saisie->enSaisie = 0; // on ne saisie plus
+    if(positionEntree == 1) saisie->nomL[saisie->indice] = 0; // le 0 terminal
+    if(positionEntree == 2) saisie->nbLignes[saisie->indice] = 0; // le 0 terminal
+    if(positionEntree == 3) saisie->nbColonnes[saisie->indice] = 0; // le 0 terminal
+
+    saisie->indice = 0;
 }
 
-char *recuperer_partie_texte(Saisie saisie)
+char *recuperer_partie_texte(Saisie saisie, int positionEntree)
 {
     int tailleSaisie = saisie.indice;
     char *chaineTemporaire = NULL;
@@ -1148,7 +1241,10 @@ char *recuperer_partie_texte(Saisie saisie)
 
     for(i = 0; i < tailleSaisie; i++)
     {
-        chaineTemporaire[i] = saisie.texte[i];
+        if(positionEntree == 1) chaineTemporaire[i] = saisie.nomL[i];
+        if(positionEntree == 2) chaineTemporaire[i] = saisie.nbLignes[i];
+        if(positionEntree == 3) chaineTemporaire[i] = saisie.nbColonnes[i];
+
     }
     chaineTemporaire[i] = 0;
     return chaineTemporaire;
