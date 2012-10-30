@@ -1,11 +1,11 @@
 #ifndef GENERATION_H_INCLUDED
 #define GENERATION_H_INCLUDED
 
-struct coordonnees
+typedef struct
 {
     int x;
     int y;
-};
+} Coordonnees;
 struct coordonneesMurs
 {
     int x;

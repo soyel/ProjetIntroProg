@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
-	<File name="affichage.c" open="1" top="0" tabpos="11">
-		<Cursor position="9727" topLine="248" />
+	<ActiveTarget name="Debug" />
+	<File name="affichage.c" open="1" top="0" tabpos="10">
+		<Cursor position="1063" topLine="18" />
 	</File>
-	<File name="affichage.h" open="1" top="0" tabpos="5">
+	<File name="affichage.h" open="1" top="0" tabpos="4">
 		<Cursor position="87" topLine="0" />
 	</File>
-	<File name="generation.c" open="1" top="0" tabpos="7">
-		<Cursor position="1693" topLine="73" />
+	<File name="generation.c" open="1" top="0" tabpos="6">
+		<Cursor position="8743" topLine="219" />
 	</File>
-	<File name="generation.h" open="1" top="0" tabpos="3">
-		<Cursor position="64" topLine="0" />
+	<File name="generation.h" open="1" top="0" tabpos="2">
+		<Cursor position="113" topLine="0" />
 	</File>
-	<File name="gestion_fichiers.c" open="1" top="0" tabpos="8">
-		<Cursor position="443" topLine="29" />
+	<File name="gestion_fichiers.c" open="1" top="0" tabpos="7">
+		<Cursor position="443" topLine="23" />
 	</File>
-	<File name="gestion_fichiers.h" open="1" top="0" tabpos="10">
+	<File name="gestion_fichiers.h" open="1" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="getch_tool.c" open="1" top="0" tabpos="9">
-		<Cursor position="559" topLine="0" />
+	<File name="getch_tool.c" open="1" top="0" tabpos="8">
+		<Cursor position="531" topLine="0" />
 	</File>
-	<File name="jeu.c" open="1" top="0" tabpos="4">
-		<Cursor position="18464" topLine="399" />
+	<File name="jeu.c" open="1" top="1" tabpos="3">
+		<Cursor position="33310" topLine="693" />
 	</File>
-	<File name="jeu.h" open="1" top="0" tabpos="6">
-		<Cursor position="472" topLine="0" />
+	<File name="jeu.h" open="1" top="0" tabpos="5">
+		<Cursor position="979" topLine="1" />
 	</File>
-	<File name="main.c" open="1" top="0" tabpos="2">
+	<File name="main.c" open="1" top="0" tabpos="1">
 		<Cursor position="240" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

@@ -181,15 +181,16 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         compteurMur -= 1;
     }
 
-    /*int nbMalusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;
-    int nbBonusAdistribuer = (((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/3)/2;*/
-
     int compteurCelluleVide = 0;
     int celluleAleatoire;
     int typeBonusMalus;
     char bonusMalus = 'o';
 
-    struct coordonnees toutesCellulesVides[(nbLignes - 2)*(nbColonnes - 2)];
+    double nbElementsCarte = (10 * (double)nbLignes * (double)nbColonnes) / 100;
+    int nbMonstres = (int)nbElementsCarte / 2;
+    int nbBonusMalus = (int)nbElementsCarte / 2;
+
+    Coordonnees toutesCellulesVides[(nbLignes - 2)*(nbColonnes - 2)];
     for(i = 0; i < nbLignes; i++)
     {
         for(j = 0; j < nbColonnes; j++)
@@ -200,33 +201,69 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
                 toutesCellulesVides[compteurCelluleVide].y = j;
                 compteurCelluleVide += 1;
             }
-
         }
     }
-
-    while(compteurCelluleVide > 0)
+    while(nbBonusMalus > 0)
     {
-        celluleAleatoire = rand()%compteurCelluleVide;
-        typeBonusMalus = rand()%2;
-        if(typeBonusMalus == 1)
+        celluleAleatoire = rand() % compteurCelluleVide;
+        typeBonusMalus = rand() % 100;
+        if(typeBonusMalus >= 15 && typeBonusMalus <= 99)
         {
-            bonusMalus = 'm';
-        }
-        else
-        {
-            bonusMalus = 'b';
-        }
-        typeBonusMalus = rand()%20;
-        if(typeBonusMalus >=0 && typeBonusMalus <= 3)
-        {
+
+            typeBonusMalus = rand()%4;
+            if(typeBonusMalus >= 0 && typeBonusMalus <= 2)
+            {
+                bonusMalus = 'b';
+            }
+            else
+            {
+                bonusMalus = 'm';
+            }
             laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
         }
+
+        /*typeBonusMalus = rand()%100;
+        if(typeBonusMalus >=0 && typeBonusMalus <= 18)
+        {
+            if(typeBonusMalus >= 0 && typeBonusMalus <= 12)
+            {
+                laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = 'b';
+            }
+            else
+            {
+                laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = 'm';
+            }
+
+        }*/
 
 
         toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
         toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
         compteurCelluleVide -= 1;
+        nbBonusMalus -=1;
 
+    }
+    while(nbMonstres > 0)
+    {
+        celluleAleatoire = rand()%compteurCelluleVide;
+        typeBonusMalus = rand() % 100;
+        if(typeBonusMalus >= 15 && typeBonusMalus <= 99)
+        {
+            typeBonusMalus = rand()%2;
+            if(typeBonusMalus == 1)
+            {
+                bonusMalus = 'f';
+            }
+            else
+            {
+                bonusMalus = 'f';
+            }
+            laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
+        }
+        toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
+        toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
+        compteurCelluleVide -= 1;
+        nbMonstres -=1;
     }
     laby[nbColonnes * 1 + 0] = ' ';
     laby[nbColonnes * (nbLignes-2) + (nbColonnes-1)] = ' ';

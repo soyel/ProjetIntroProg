@@ -11,6 +11,7 @@
     #define clear() system("clear")
 #endif
 
+#include "generation.h"
 #include "jeu.h"
 #include "affichage.h"
 
@@ -110,8 +111,9 @@ void verifier_position_score(scoreJoueur* tableauScores, int *nbScore, scoreJoue
  * @param directionY l'ordonnée de la direction
  * @param score le score du joueur
  */
-void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe)
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe, Monstre *tabMonstres, int tailleTabM)
 {
+    int i;
     //if(verifier_possibilite(laby, nbColonnes, 1, 0) == 1)
     if(verifier_possibilite(laby, nbColonnes, directionX, directionY) == 1)
     {
@@ -119,6 +121,10 @@ void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, in
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_X += directionX;
         positionActuelle_Y += directionY;
+        for(i = 0; i < tailleTabM; i++)
+        {
+            laby[nbLignes * tabMonstres[i].positionX + tabMonstres[i].positionY] = tabMonstres[i].typeMonstre;
+        }
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
         clear();
         afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe);
@@ -574,6 +580,199 @@ void enregistrer_topscore(int score, char *nomLaby)
     }
 }
 
+Monstre *analyser_monstres(char *laby, size_t nbLignes, size_t nbColonnes, int *tailleTabMonstres)
+{
+    size_t i;
+    size_t j;
+
+    int compteurNombreMonstres;
+    compteurNombreMonstres = 0;
+
+    for(i = 0; i < nbLignes; i++)
+    {
+        for(j = 0; j < nbColonnes; j++)
+        {
+            if(laby[nbColonnes * i + j] == 'g' || laby[nbColonnes * i + j] == 'f')
+            {
+                compteurNombreMonstres ++;
+            }
+        }
+    }
+    Monstre *tabMonstres;
+    tabMonstres = malloc (compteurNombreMonstres * sizeof(Monstre));
+    compteurNombreMonstres = 0;
+    for(i = 0; i < nbLignes; i++)
+    {
+        for(j = 0; j < nbColonnes; j++)
+        {
+            if(laby[nbColonnes * i + j] == 'g' || laby[nbColonnes * i + j] == 'f')
+            {
+                printf("SYMBOLE : %c", laby[nbColonnes * i + j]);
+                tabMonstres[compteurNombreMonstres].typeMonstre = laby[nbColonnes * i + j];
+                tabMonstres[compteurNombreMonstres].positionX = i;
+                tabMonstres[compteurNombreMonstres].positionY = j;
+                tabMonstres[compteurNombreMonstres].dernierCaractere = ' ';
+                tabMonstres[compteurNombreMonstres].penalite = (rand()%2) + 1 ;
+                printf("Monstre de type %c, aux coordonnees %d, %d et avec une penalite de %d\n", tabMonstres[compteurNombreMonstres].typeMonstre, tabMonstres[compteurNombreMonstres].positionX, tabMonstres[compteurNombreMonstres].positionY, tabMonstres[compteurNombreMonstres].penalite);
+                compteurNombreMonstres ++;
+                //laby[nbLignes * i + j] = ' ';
+            }
+        }
+    }
+
+    *tailleTabMonstres = compteurNombreMonstres;
+    return tabMonstres;
+}
+
+void deplacer_monstres(Monstre *tabMonstres, size_t nbL, size_t nbC, int tailleTabM, char *laby)
+{
+
+    int i;
+    int continuerDirection;
+    int directionAprendre;
+    for(i = 0; i < tailleTabM; i++)
+    {
+        laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] = ' ';
+        if(tabMonstres[i].dernierCaractere != ' ')
+        {
+            laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] = tabMonstres[i].dernierCaractere;
+        }
+        continuerDirection = 1;
+        if(tabMonstres[i].typeMonstre == 'f')
+        {
+            directionAprendre = rand()%4 + 1;
+            while(continuerDirection)
+            {
+                if(directionAprendre == 1)
+                {
+                    if(tabMonstres[i].positionX - tabMonstres[i].penalite > 0) //en dehors du tableau
+                    {
+                        tabMonstres[i].positionX -= tabMonstres[i].penalite;
+                        continuerDirection = 0;
+                    }
+                    else
+                    {
+                        if(tabMonstres[i].penalite > 1 && tabMonstres[i].positionX - (tabMonstres[i].penalite - 1) > 0)
+                        {
+                            tabMonstres[i].positionX = tabMonstres[i].positionX - (tabMonstres[i].penalite - 1);
+                            continuerDirection = 0;
+                        }
+                        else
+                        {
+                            directionAprendre +=1;
+                        }
+                    }
+                }
+                if(directionAprendre == 2)
+                {
+                    if(tabMonstres[i].positionY + tabMonstres[i].penalite < nbC - 1) //en dehors du tableau
+                    {
+                        tabMonstres[i].positionY += tabMonstres[i].penalite;
+                        continuerDirection = 0;
+                    }
+                    else
+                    {
+                        if(tabMonstres[i].penalite > 1 && tabMonstres[i].positionY + (tabMonstres[i].penalite - 1) < nbC - 1)
+                        {
+                            tabMonstres[i].positionY = tabMonstres[i].positionY + (tabMonstres[i].penalite - 1);
+                            continuerDirection = 0;
+                        }
+                        else
+                        {
+                            directionAprendre +=1;
+                        }
+                    }
+                }
+                if(directionAprendre == 3)
+                {
+                    if(tabMonstres[i].positionX + tabMonstres[i].penalite < nbL - 1) //en dehors du tableau
+                    {
+                        tabMonstres[i].positionX += tabMonstres[i].penalite;
+                        continuerDirection = 0;
+                    }
+                    else
+                    {
+                        if(tabMonstres[i].penalite > 1 && tabMonstres[i].positionX + (tabMonstres[i].penalite - 1) < nbL - 1)
+                        {
+                            tabMonstres[i].positionX = tabMonstres[i].positionX + (tabMonstres[i].penalite - 1);
+                            continuerDirection = 0;
+                        }
+                        else
+                        {
+                            directionAprendre +=1;
+                        }
+                    }
+                }
+                if(directionAprendre == 4)
+                {
+                    if(tabMonstres[i].positionY - tabMonstres[i].penalite > 0) //en dehors du tableau
+                    {
+                        tabMonstres[i].positionY -= tabMonstres[i].penalite;
+                        continuerDirection = 0;
+                    }
+                    else
+                    {
+                        if(tabMonstres[i].penalite > 1 && tabMonstres[i].positionY - (tabMonstres[i].penalite - 1) > 0)
+                        {
+                            tabMonstres[i].positionY = tabMonstres[i].positionY - (tabMonstres[i].penalite - 1);
+                            continuerDirection = 0;
+                        }
+                        else
+                        {
+                            directionAprendre = 1;
+                        }
+                    }
+                }
+            }
+            if(laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] != ' ' && laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] != 'o' && laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] != 'f' && laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY] != 'g')
+            {
+                tabMonstres[i].dernierCaractere = laby[nbC * tabMonstres[i].positionX + tabMonstres[i].positionY];
+            }
+            else
+            {
+                tabMonstres[i].dernierCaractere = ' ';
+            }
+        }
+        /*else
+        {
+
+        }*/
+    }
+}
+
+Coordonnees *recuperer_murs(char *laby, size_t nbLignes, size_t nbColonnes, int *tailleTabMurs)
+{
+    size_t i;
+    size_t j;
+    int compteurMurs = 0;
+    Coordonnees *tabCoord;
+    for(i = 1; i < nbLignes - 1; i++)
+    {
+        for(j = 1; j < nbColonnes - 1; j++) //on exclut les bords
+        {
+            if(laby[nbColonnes * i + j] == '#')
+            {
+                compteurMurs++;
+            }
+        }
+    }
+    tabCoord = malloc (compteurMurs * sizeof(Coordonnees));
+    compteurMurs = 0;
+    for(i = 1; i < nbLignes - 1; i++)
+    {
+        for(j = 1; j < nbColonnes - 1; j++) //on exclut les bords
+        {
+            if(laby[nbColonnes * i + j] == '#')
+            {
+                tabCoord[compteurMurs].x = i;
+                tabCoord[compteurMurs].y = j;
+                compteurMurs++;
+            }
+        }
+    }
+    *tailleTabMurs = compteurMurs;
+    return tabCoord;
+}
 /**
  * Joue une partie jusqu'à ce que le joueur n'atteigne la sortie,
  * ou appuie sur la touche 'f'
@@ -583,7 +782,16 @@ void enregistrer_topscore(int score, char *nomLaby)
  * @param nomLabyrinthe le nom du labyrinthe
  * @param avecClassement partie avec classement ou non
  */
-void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, int avecClassement)
+
+void remettre_murs(char *laby, size_t nbColonnes, Coordonnees *lesMurs, int tailleTabMurs)
+{
+    int i;
+    for(i = 0; i < tailleTabMurs; i++)
+    {
+        laby[nbColonnes * lesMurs[i].x + lesMurs[i].y] = '#';
+    }
+}
+void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe)
 {
     clear();
     laby[nbColonnes * 1 + 0] = 'o';
@@ -597,6 +805,11 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
     time_t debut = time(NULL);
     time_t fin;
 
+    int tailleTabMonstres;
+    int tailleTabMurs;
+    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe);
+    Monstre *tabMonstres = analyser_monstres(laby, nbLignes, nbColonnes, &tailleTabMonstres);
+    Coordonnees *lesMurs = recuperer_murs(laby, nbLignes, nbColonnes, &tailleTabMurs);
     afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe);
 
     fflush(stdin);
@@ -605,16 +818,24 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
         touche = getch();
         switch(touche)
         {
-            case 'd': deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe);
+            case 'd':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                        deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
+                        //remettre_murs(laby, nbColonnes, lesMurs, tailleTabMurs);
                         break;
-            case 'q': deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe);
+
+            case 'q':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                        deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
+                        //remettre_murs(laby, nbColonnes, lesMurs, tailleTabMurs);
                         break;
-            case 's': deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe);
+
+            case 's':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                        deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
+                        //remettre_murs(laby, nbColonnes, lesMurs, tailleTabMurs);
                         break;
-            case 'z': deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe);
-                        break;
-            case 'i': trouver_chemin_de_sortie(laby, nbLignes, nbColonnes);
-                        touche = 'f';
+
+            case 'z':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                        deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
+                        //remettre_murs(laby, nbColonnes, lesMurs, tailleTabMurs);
                         break;
         }
         if(verifier_position_gagnante(nbLignes, nbColonnes)==1)
@@ -630,14 +851,7 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
                 scoreTotal = 0;
             }
             printf("\tScore total    : %d\n", scoreTotal);
-            if(avecClassement == 1)
-            {
-                enregistrer_topscore(scoreTotal, nomLabyrinthe);
-            }
-            else
-            {
-                printf("\n---------------------------------------------------------------------------\n");
-            }
+            enregistrer_topscore(scoreTotal, nomLabyrinthe);
             touche = 'f';
         }
     }

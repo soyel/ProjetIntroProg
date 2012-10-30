@@ -41,8 +41,7 @@ void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int sco
         printf("\n");
     }
     printf("\n\040\040[AIDE]:\n");
-    printf("\t'f' pour quitter la partie\n");
-    printf("\t'i' pour tracer la solution du labyrinthe (mettra fin a la partie)\n\n");
+    printf("\t'f' pour quitter la partie\n\n");
     printf("--RESULTATS-----------------------------------------------------------------\n\n");
     printf("\tVotre SCORE    : %d\n", score);
     return;
@@ -96,39 +95,55 @@ void afficher_menu()
     int nbLignes;
     int nbColonnes;
     int choix_menu = 1;
-    int i;
+
+    int fichierCharge = 0;
+
+    int continuerAffichage = 1;
 
     char nomLaby[31];
     char nomFichier[35];
 
-    while(choix_menu != 5)
+    while(continuerAffichage)
     {
         do
         {
             clear();
+            if(fichierCharge)
+            {
+                printf("[INFO] : Le labyrinthe charge actuellement : %s\n", nomLaby);
+            }
             printf("---------------------------------------------------------------------------\n");
             printf("| 1. Creer un labyrinthe\n");
             printf("| 2. Charger un labyrinthe\n");
-            printf("| 3. Jouer une partie\n");
-            printf("| 4. Trouver chemin\n");
-            printf("| 5. Quitter\n");
+            if(fichierCharge)
+            {
+                printf("| 3. Jouer une partie\n");
+                printf("| 4. Trouver chemin\n");
+                printf("| 5. Quitter\n");
+            }
+            else
+            {
+                printf("| 3. Quitter\n");
+            }
             printf("---------------------------------------------------------------------------\n");
             printf("Entrez un numero : ");
             scanf("%d", &choix_menu);
 
-            if(choix_menu < 1 || choix_menu > 5)
+            /*if(choix_menu < 1 || choix_menu > 5)
             {
                 printf("INFO : Choix incorrecte !\n");
-            }
+            }*/
         }
         while(choix_menu < 1 || choix_menu > 5);
 
         clear();
-        memset(&nomFichier[0], 0, sizeof(nomFichier));
-        memset(&nomLaby[0], 0, sizeof(nomLaby));
+        //memset(&nomFichier[0], 0, sizeof(nomFichier));
+        //memset(&nomLaby[0], 0, sizeof(nomLaby));
 
         if(choix_menu == 1)
         {
+            memset(&nomFichier[0], 0, sizeof(nomFichier));
+            memset(&nomLaby[0], 0, sizeof(nomLaby));
             printf("\t\tCreation d'un nouveau labyrinthe\n\n");
             printf("---Informations du labyrinthe----------------------------------------------\n\n");
             printf("\tNom du labyrinthe : ");
@@ -149,17 +164,24 @@ void afficher_menu()
 
             if (fichier != NULL)
             {
+                fichierCharge = 1;
                 remplir_fichier(fichier, &(laby[0][0]), N, M);
 
                 printf("\n---------------------------------------------------------------------------\n");
                 printf("INFO : Le labyrinthe a ete cree avec succes");
-                printf("\n\n\tLa partie va demarrer dans quelques instants... ");
+
+                printf("\n\nAppuyez sur n'importe quelle touche pour revenir au menu principal");
+                getch();
+
+                /*JOUER APRES CREATION*/
+
+                /*printf("\n\n\tLa partie va demarrer dans quelques instants... ");
                 for(i = 3; i >= 1; i--)
                 {
                     printf("%d  ", i);
                     dormir(1000);
                 }
-                jouer(&(laby[0][0]), N, M, nomLaby, 0);
+                jouer(&(laby[0][0]), N, M, nomLaby);
                 fclose(fichier);
 
                 char chaine[TAILLE_LIGNE];
@@ -192,7 +214,7 @@ void afficher_menu()
                             dormir(1000);
                         }
 
-                        jouer(&(laby[0][0]), N, M, nomLaby, 0);
+                        jouer(&(laby[0][0]), N, M, nomLaby);
 
                         printf("\nVoulez-vous recommencer ? (O/N) : ");
                         fflush(stdin);
@@ -202,17 +224,24 @@ void afficher_menu()
                     }
                     else
                     {
+                        fichierCharge = 0;
                         printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
                         dormir(2500);
                         choixRecommencer = 'N';
                     }
                 }
+                */
+                fclose(fichier);
             }
             else
             {
+                memset(&nomFichier[0], 0, sizeof(nomFichier));
+                memset(&nomLaby[0], 0, sizeof(nomLaby));
                 printf("\n\tAttention : Impossible de creer le fichier\n");
-                dormir(2500);
+                printf("\tAppuyez sur n'importe quelle touche pour revenir au menu principal");
+                getch();
             }
+
         }
         else if(choix_menu == 2)
         {
@@ -244,15 +273,38 @@ void afficher_menu()
             }
             else
             {
+                memset(&nomFichier[0], 0, sizeof(nomFichier));
+                memset(&nomLaby[0], 0, sizeof(nomLaby));
                 printf("\n---------------------------------------------------------------------------\n");
                 printf("Nom du fichier (sans extension) : ");
                 scanf("%s", nomLaby);
 
-
                 strcpy(nomFichier, nomLaby);
                 strcat(nomFichier, ".init");
 
-                char chaine[TAILLE_LIGNE];
+                fichierCharge = 1;
+
+                fichier = fopen(nomFichier, "r");
+
+                if (fichier != NULL)
+                {
+                    printf("---------------------------------------------------------------------------\n");
+                    printf("INFO : Le labyrinthe a ete charge avec succes");
+
+                    printf("\n\nAppuyez sur n'importe quelle touche pour revenir au menu principal");
+                    getch();
+                }
+                else
+                {
+                    fichierCharge = 0;
+                    memset(&nomFichier[0], 0, sizeof(nomFichier));
+                    memset(&nomLaby[0], 0, sizeof(nomLaby));
+                    printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
+                    printf("\tAppuyez sur n'importe quelle touche pour revenir au menu principal\n");
+                    getch();
+                }
+                fclose(fichier);
+                /*char chaine[TAILLE_LIGNE];
                 char choixRecommencer = 1;
 
                 int i;
@@ -283,7 +335,7 @@ void afficher_menu()
                             dormir(1000);
                         }
 
-                        jouer(&(laby[0][0]), N, M, nomLaby, 0);
+                        jouer(&(laby[0][0]), N, M, nomLaby);
 
                         printf("\nVoulez-vous recommencer ? (O/N) : ");
                         fflush(stdin);
@@ -299,39 +351,129 @@ void afficher_menu()
                     }
                 }
                 while(choixRecommencer != 'N');
+                */
             }
             closedir(rep);
         }
         else if(choix_menu == 3)
         {
-            char choixRecommencer = 1;
-            do
+            if(fichierCharge)
             {
-                clear();
-                char laby [9][23];
-                size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
-                creer_labyrinthe(&(laby[0][0]), N, M);
-                printf("\n\tLa partie va demarrer dans quelques instants... ");
-                for(i = 3; i >= 1; i--)
+                char choixRecommencer;
+                char chaine[TAILLE_LIGNE];
+
+                /*do
                 {
-                    printf("%d  ", i);
-                    dormir(1000);
+                    strcpy(nomFichier, nomLaby);
+                    strcat(nomFichier, ".init");
+                    clear();
+                    char laby [9][23];
+                    size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
+                    creer_labyrinthe(&(laby[0][0]), N, M);
+                    printf("\n\tLa partie va demarrer dans quelques instants... ");
+                    for(i = 3; i >= 1; i--)
+                    {
+                        printf("%d  ", i);
+                        dormir(1000);
+                    }
+                    jouer(&(laby[0][0]), N, M, );
+                    printf("\nVoulez-vous recommencer ? (O/N) : ");
+                    fflush(stdin);
+                    scanf("%c", &choixRecommencer);
+                }while(choixRecommencer != 'N');*/
+                int i;
+
+                do
+                {
+                    fichier = fopen(nomFichier, "r");
+
+                    if (fichier != NULL)
+                    {
+                        memset(&chaine[0], 0, sizeof(chaine));
+                        fgets(chaine, TAILLE_LIGNE, fichier);
+                        nbLignes = atoi(chaine);
+
+                        memset(&chaine[0], 0, sizeof(chaine));
+                        fgets(chaine, TAILLE_LIGNE, fichier);
+                        nbColonnes = atoi(chaine);
+
+                        char laby [nbLignes][nbColonnes];
+                        size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
+
+                        lire_fichier_labyrinthe(fichier, &(laby[0][0]), N, M);
+
+                        printf("\n\tLa partie va demarrer dans quelques instants... ");
+                        for(i = 3; i >= 1; i--)
+                        {
+                            printf("%d  ", i);
+                            dormir(1000);
+                        }
+
+                        jouer(&(laby[0][0]), N, M, nomLaby);
+
+                        printf("\nVoulez-vous recommencer ? (O/N) : ");
+                        fflush(stdin);
+                        scanf("%c", &choixRecommencer);
+
+                        fclose(fichier);
+                    }
+                    else
+                    {
+                        printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
+                        printf("\tAppuyez sur n'importe quelle touche pour revenir au menu principal\n");
+                        getch();
+                        choixRecommencer = 'N';
+                    }
                 }
-                jouer(&(laby[0][0]), N, M, "Par defaut", 1);
-                printf("\nVoulez-vous recommencer ? (O/N) : ");
-                fflush(stdin);
-                scanf("%c", &choixRecommencer);
-            }while(choixRecommencer != 'N');
+                while(choixRecommencer != 'N');
+            }
+            else
+            {
+                continuerAffichage = 0;
+            }
         }
         else if(choix_menu == 4)
         {
-            char laby [9][23];
-            size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
-            creer_labyrinthe(&(laby[0][0]), N, M);
-            trouver_chemin_de_sortie(&(laby[0][0]), N, M);
+            if(fichierCharge)
+            {
+                fichier = fopen(nomFichier, "r");
+
+                if (fichier != NULL)
+                {
+                    char chaine[TAILLE_LIGNE];
+
+                    memset(&chaine[0], 0, sizeof(chaine));
+                    fgets(chaine, TAILLE_LIGNE, fichier);
+                    nbLignes = atoi(chaine);
+
+                    memset(&chaine[0], 0, sizeof(chaine));
+                    fgets(chaine, TAILLE_LIGNE, fichier);
+                    nbColonnes = atoi(chaine);
+
+                    char laby [nbLignes][nbColonnes];
+                    size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
+
+                    lire_fichier_labyrinthe(fichier, &(laby[0][0]), N, M);
+
+                    trouver_chemin_de_sortie(&(laby[0][0]), N, M);
+
+                    printf("\nAppuyez sur n'importe quelle touche pour revenir au menu principal");
+                    getch();
+                }
+                else
+                {
+                    printf("\n\tAttention : Impossible d'ouvrir le fichier\n");
+                    printf("\tAppuyez sur n'importe quelle touche pour revenir au menu principal\n");
+                    getch();
+                }
+            }
         }
-        else{
-            return;
+        else
+        {
+            if(fichierCharge != 0)
+            {
+                continuerAffichage = 0;
+            }
         }
     }
     return;

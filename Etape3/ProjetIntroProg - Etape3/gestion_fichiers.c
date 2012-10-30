@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "gestion_fichiers.h"
+#include "affichage.h"
 
 /**
  * Remplit un fichier avec un labyrinthe initialisé
