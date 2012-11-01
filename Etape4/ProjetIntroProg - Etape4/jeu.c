@@ -3,14 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include <SDL.h>
-
-#ifdef __WIN32__
-    #include <conio.h>
-    #define clear() system("cls")
-#else
-    #include "getch_tool.h"
-    #define clear() system("clear")
-#endif
+#include <SDL_image.h>
 
 #include "jeu.h"
 #include "affichage.h"
@@ -166,9 +159,6 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes, SD
 
     mur = IMG_Load("images/mur.png");
     solution = IMG_Load("images/solutionIcone.png");
-
-    size_t ligne;
-    size_t colonne;
 
     SDL_BlitSurface(iCreation.imageDeFond2, NULL, ecran, &iCreation.positionImageDeFond2);
     SDL_BlitSurface(iCreation.retourMenu, NULL, ecran, &iCreation.positionRetourMenu);
