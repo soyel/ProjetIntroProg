@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <SDL.h>
 
 #ifdef __WIN32__
     #include <conio.h>
@@ -10,9 +11,9 @@
     #include "getch_tool.h"
     #define clear() system("clear")
 #endif
+
 #include "jeu.h"
 #include "affichage.h"
-
 
 
 int positionActuelle_X = 1;
@@ -132,23 +133,16 @@ char rechercher_monstre(int x, int y, Monstre *tabMonstres, int tailleTabMonstre
  * @param directionY l'ordonnée de la direction
  * @param score le score du joueur
  */
-void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe, Monstre *tabMonstres, int tailleTabM)
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe, Monstre *tabMonstres, int tailleTabM, SDL_Surface *ecran, InterfaceCreationLaby iCreation)
 {
-    //int i;
-    //if(verifier_possibilite(laby, nbColonnes, 1, 0) == 1)
     if(verifier_possibilite(laby, nbColonnes, directionX, directionY) == 1)
     {
         *score += 10 * verifier_bonus_malus(laby, nbColonnes, directionX, directionY);
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = ' ';
         positionActuelle_X += directionX;
         positionActuelle_Y += directionY;
-        /*for(i = 0; i < tailleTabM; i++)
-        {
-            laby[nbLignes * tabMonstres[i].positionX + tabMonstres[i].positionY] = tabMonstres[i].typeMonstre;
-        }*/
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        clear();
-        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe, tabMonstres, tailleTabM);
+        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe, tabMonstres, tailleTabM, ecran, iCreation);
     }
     return;
 }
@@ -160,78 +154,76 @@ void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, in
  * @param nbLignes le nombre de lignes du labyrinthe
  * @param nbColonnes le nombre de colonnes du labyrinthe
  */
-void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
+void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes, SDL_Surface *ecran, InterfaceCreationLaby iCreation)
 {
+    SDL_Surface *mur = NULL;
+    SDL_Surface *solution = NULL;
+
+    SDL_Rect positionCase;
+
+    positionCase.x = 50;
+    positionCase.y = 50;
+
+    mur = IMG_Load("images/mur.png");
+    solution = IMG_Load("images/solutionIcone.png");
+
+    size_t ligne;
+    size_t colonne;
+
+    SDL_BlitSurface(iCreation.imageDeFond2, NULL, ecran, &iCreation.positionImageDeFond2);
+    SDL_BlitSurface(iCreation.retourMenu, NULL, ecran, &iCreation.positionRetourMenu);
+
     int position_Actuelle_X = 1;
     int position_Actuelle_Y = 0;
+
+    int i;
+    int j;
 
     int direction_x = 0;
     int direction_y = 1;
 
-    clear();
-    printf("\n--SOLUTION-----------------------------------------------------------------\n\n");
     while(position_Actuelle_X != nbLignes - 2 || position_Actuelle_Y != nbColonnes - 1)
     {
-        //printf("\n--------------------\n");
-       // afficher_labyrinthe(laby, nbLignes, nbColonnes, 0);
-        //printf("\n--------------------\n");
-        //printf("\nPosition Act X : %d\n", position_Actuelle_X);
-        //printf("Position Act Y : %d\n", position_Actuelle_Y);
-        //printf("DIRECTION X : %d\n", direction_x);
-        //printf("DIRECTION Y : %d\n", direction_y);
         //déplacement à droite
         if(direction_x == 0 && direction_y == 1)
         {
-            //printf("ON SE DEPLACE A DROITE\n");
             //si là où on va n'est pas un mur
             if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] != '#')
             {
-                //printf("IL N Y A PAS DE MUR DEVANT\n");
                 //si là où va est -, on y met +
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '.')
                 {
-                    //printf("ON EST DEJA PASSE ICI\n");
                     laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] = '+';
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
-
                 //si là où on va est +, on vérifie derriere
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '+')
                 {
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
                 //si là où on est n'est pas +, on y met -
                 if(laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] != '+')
                 {
-                    //printf("ON LAISSE UNE TRACE ICI\n");
                     laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] = '.';
                 }
-
-
                 //si à droite de là où on va n'est pas un mur
                 if(laby[nbColonnes * (position_Actuelle_X + 1) + (position_Actuelle_Y + 1)] != '#')
                 {
-                   //printf("ON TOURNE EN BAS \n");
                     direction_x = 1;
                     direction_y = 0;
                 }
-
                 position_Actuelle_X += 0;
                 position_Actuelle_Y += 1;
-                //printf("ON AVANCE EN %d, %d\n", position_Actuelle_X, position_Actuelle_Y);
             }
             //si c'est un mur
             else
             {
-                //printf("ON TOURNE EN HAUT\n");
                 direction_x = -1;
                 direction_y = 0;
             }
@@ -239,54 +231,42 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
         //direction à gauche
         else if(direction_x == 0 && direction_y == -1)
         {
-           //printf("ON SE DEPLACE A GAUCHE\n");
             if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] != '#')
             {
-                //printf("IL N Y A PAS DE MUR DEVANT\n");
                 //si là où va est -, on y met +
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '.')
                 {
-                    //printf("ON EST DEJA PASSE ICI\n");
                     laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] = '+';
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
-
                 //si là où on va est +, on vérifie derriere
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '+')
                 {
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
                 //si là où on est n'est pas +, on y met -
                 if(laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] != '+')
                 {
-                    //printf("ON LAISSE UNE TRACE ICI\n");
                     laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] = '.';
                 }
-
                 //si à droite de là où on va n'est pas un mur
                 if(laby[nbColonnes * (position_Actuelle_X - 1) + (position_Actuelle_Y - 1)] != '#')
                 {
-                    //printf("ON TOURNE EN HAUT \n");
                     direction_x = -1;
                     direction_y = 0;
                 }
-
                 position_Actuelle_X += 0;
                 position_Actuelle_Y += -1;
-                //printf("ON AVANCE EN %d, %d\n", position_Actuelle_X, position_Actuelle_Y);
             }
             //si c'est un mur
             else
             {
-                //printf("ON TOURNE EN BAS\n");
                 direction_x = 1;
                 direction_y = 0;
             }
@@ -294,57 +274,44 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
         //direction en haut
         else if(direction_x == -1 && direction_y == 0)
         {
-            //printf("ON SE DEPLACE EN HAUT\n");
             //si là où on va n'est pas un mur
             if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] != '#')
             {
-                //printf("IL N Y A PAS DE MUR DEVANT\n");
                 //si là où va est -, on y met +
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '.')
                 {
-                    //printf("ON EST DEJA PASSE ICI\n");
                     laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] = '+';
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
-
-                                //si là où on va est +, on vérifie derriere
+                //si là où on va est +, on vérifie derriere
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '+')
                 {
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
-                        //printf("ON EFFACE LE - DERRIERE NOUS\n");
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
-
                 //si là où on est n'est pas +, on y met -
                 if(laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] != '+')
                 {
-                    //printf("ON LAISSE UNE TRACE ICI\n");
                     laby[nbColonnes * position_Actuelle_X + position_Actuelle_Y] = '.';
                 }
 
                 //si à droite de là où on va n'est pas un mur
                 if(laby[nbColonnes * (position_Actuelle_X - 1) + (position_Actuelle_Y + 1)] != '#')
                 {
-                    //printf("ON TOURNE à DROITE \n");
                     direction_x = 0;
                     direction_y = 1;
                 }
-
                 position_Actuelle_X += -1;
                 position_Actuelle_Y += 0;
-                //printf("ON AVANCE EN %d, %d\n", position_Actuelle_X, position_Actuelle_Y);
-
             }
             //si c'est un mur
             else
             {
-                //printf("ON TOURNE A GAUCHE\n");
                 direction_x = 0;
                 direction_y = -1;
             }
@@ -352,21 +319,18 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
         //direction en bas
         else
         {
-            //printf("ON SE DEPLACE EN BAS\n");
             if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] != '#')
             {
-                //printf("IL N Y A PAS DE MUR DEVANT\n");
                 //si là où va est -, on y met +
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '.')
                 {
-                    //printf("ON EST DEJA PASSE ICI\n");
                     laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] = '+';
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
                     {
                         laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] = '+';
                     }
                 }
-                                //si là où on va est +, on vérifie derriere
+                //si là où on va est +, on vérifie derriere
                 if(laby[nbColonnes * (position_Actuelle_X + direction_x) + (position_Actuelle_Y + direction_y)] == '+')
                 {
                     if(laby[nbColonnes * (position_Actuelle_X - direction_x) + (position_Actuelle_Y - direction_y)] == '.')
@@ -386,7 +350,6 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
                     direction_x = 0;
                     direction_y = -1;
                 }
-
                 position_Actuelle_X += 1;
                 position_Actuelle_Y += 0;
             }
@@ -398,18 +361,14 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
         }
     }
 
-    int i;
-    int j;
-
     laby[nbColonnes * 1 + 0] = '.';
     laby[nbColonnes * (nbLignes - 2) + (nbColonnes - 1)] = '.';
 
     for(i = 0; i < nbLignes; i++)
     {
-        printf("\t");
         for(j = 0; j < nbColonnes; j++)
         {
-            if(laby[nbColonnes * i + j] == '+' || laby[nbColonnes * i + j] == 'm' || laby[nbColonnes * i + j] == 'b' || laby[nbColonnes * i + j] == 'f' || laby[nbColonnes * i + j] == 'g')
+            if(laby[nbColonnes * i + j] == '+' || laby[nbColonnes * i + j] == 'm' || laby[nbColonnes * i + j] == 'b' || laby[nbColonnes * i + j] == 'g' || laby[nbColonnes * i + j] == 'f')
             {
                 laby[nbColonnes * i + j] = ' ';
             }
@@ -421,8 +380,6 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
             {
                 laby[nbColonnes * i + j] = '.';
             }
-
-            //
             if(laby[nbColonnes * (i - 1) + j] == '.' && laby[nbColonnes * i + (j + 1)] == '.' && laby[nbColonnes * i + j] != '#')
             {
                 laby[nbColonnes * i + j] = '.';
@@ -439,11 +396,20 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes)
             {
                 laby[nbColonnes * i + j] = '.';
             }
-            printf("%c", laby[nbColonnes * i + j]);
+            if(laby[nbColonnes * i + j] == '#')
+            {
+                SDL_BlitSurface(mur, NULL, ecran, &positionCase);
+            }
+            if(laby[nbColonnes * i + j] == '.')
+            {
+                SDL_BlitSurface(solution, NULL, ecran, &positionCase);
+            }
+            positionCase.x += 30;
         }
-        printf("\n");
+        positionCase.x = 50;
+        positionCase.y += 30;
     }
-
+    SDL_Flip(ecran);
 }
 
 /**
@@ -805,6 +771,7 @@ void deplacer_monstres(Monstre *tabMonstres, size_t nbL, size_t nbC, int tailleT
         }
     }
 }
+
 /**
  * Joue une partie jusqu'à ce que le joueur n'atteigne la sortie,
  * ou appuie sur la touche 'f'
@@ -814,16 +781,15 @@ void deplacer_monstres(Monstre *tabMonstres, size_t nbL, size_t nbC, int tailleT
  * @param nomLabyrinthe le nom du labyrinthe
  * @param avecClassement partie avec classement ou non
  */
-void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe)
+void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, SDL_Surface *ecran, InterfaceCreationLaby iCreation)
 {
-    clear();
     laby[nbColonnes * 1 + 0] = 'o';
 
     int score = 0;
     int scoreTotal = 0;
     int *p_score = &score;
 
-    char touche = 'l';
+    SDL_Event event;
 
     time_t debut = time(NULL);
     time_t fin;
@@ -831,29 +797,51 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe)
     int tailleTabMonstres;
 
     Monstre *tabMonstres = analyser_monstres(laby, nbLignes, nbColonnes, &tailleTabMonstres);
-    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
+    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
 
-    fflush(stdin);
-    while(touche != 'f')
+    int continuerAffichageLaby = 1;
+    while(continuerAffichageLaby)
     {
-        touche = getch();
-        switch(touche)
+        SDL_WaitEvent(&event); /* On attend un événement qu'on récupère dans event */
+        switch(event.type) /* On teste le type d'événement */
         {
-            case 'd':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                        deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
-                        break;
+            case SDL_QUIT:  continuerAffichageLaby = 0;
+                            break;
 
-            case 'q':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                        deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
-                        break;
+            case SDL_KEYDOWN: /* Si appui sur une touche */
+                            switch (event.key.keysym.sym)
+                            {
+                                case SDLK_ESCAPE:   continuerAffichageLaby = 0;
+                                                    break;
 
-            case 's':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                        deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
-                        break;
+                                case SDLK_s:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                                    break;
 
-            case 'z':   deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                        deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres);
-                        break;
+                                case SDLK_d:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                                    break;
+
+                                case SDLK_a:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                                    break;
+
+                                case SDLK_w:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                                    break;
+                            }
+                            break;
+
+            case SDL_MOUSEBUTTONUP:
+                            if (event.button.button == SDL_BUTTON_LEFT)
+                            {
+                                if(event.button.x > 550 && event.button.x < (550 + iCreation.retourMenu->w) && event.button.y > 8 && event.button.y < (8 + iCreation.retourMenu->h))
+                                {
+                                    continuerAffichageLaby = 0;
+                                    break;
+                                }
+                            }
+                            break;
         }
         if(verifier_position_gagnante(nbLignes, nbColonnes)==1)
         {
@@ -861,15 +849,12 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe)
             int tempsPartie = (int)difftime(fin, debut);
             scoreTotal = score - tempsPartie / 2;
 
-            printf("\tMalus de temps : %d\n", tempsPartie / 2);
-
             if(scoreTotal < 0)
             {
                 scoreTotal = 0;
             }
-            printf("\tScore total    : %d\n", scoreTotal);
-            enregistrer_topscore(scoreTotal, nomLabyrinthe);
-            touche = 'f';
+            //enregistrer_topscore(scoreTotal, nomLabyrinthe);
+            continuerAffichageLaby = 0;
         }
     }
 

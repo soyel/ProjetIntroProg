@@ -184,7 +184,7 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     int compteurCelluleVide = 0;
     int celluleAleatoire;
     int typeBonusMalus;
-    char bonusMalus = 'o';
+    char bonusMalus;
 
     double nbElementsCarte = (10 * (double)nbLignes * (double)nbColonnes) / 100;
     int nbMonstres = (int)nbElementsCarte / 4;
@@ -222,7 +222,6 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
             laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
         }
 
-
         toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
         toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
         compteurCelluleVide -= 1;
@@ -232,25 +231,24 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     while(nbMonstres > 0)
     {
         celluleAleatoire = rand()%compteurCelluleVide;
-        /*typeBonusMalus = rand() % 100;
-        if(typeBonusMalus >= 15 && typeBonusMalus <= 99)
-        {*/
-            typeBonusMalus = rand()%2;
-            if(typeBonusMalus == 1)
-            {
-                bonusMalus = 'f';
-            }
-            else
-            {
-                bonusMalus = 'g';
-            }
-            laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
-        /*}*/
+        typeBonusMalus = rand()%2;
+
+        if(typeBonusMalus == 1)
+        {
+            bonusMalus = 'f';
+        }
+        else
+        {
+            bonusMalus = 'g';
+        }
+        laby[nbColonnes * toutesCellulesVides[celluleAleatoire].x + toutesCellulesVides[celluleAleatoire].y] = bonusMalus;
+
         toutesCellulesVides[celluleAleatoire].x  = toutesCellulesVides[compteurCelluleVide-1].x;
         toutesCellulesVides[celluleAleatoire].y  = toutesCellulesVides[compteurCelluleVide-1].y;
         compteurCelluleVide -= 1;
         nbMonstres -=1;
     }
+
     laby[nbColonnes * 1 + 0] = ' ';
     laby[nbColonnes * (nbLignes-2) + (nbColonnes-1)] = ' ';
 

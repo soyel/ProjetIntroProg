@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <SDL.h>
 
 #include "jeu.h"
 #include "affichage.h"
@@ -28,84 +29,83 @@
  * @param nbColonnes le nombre de colonnes du labyrinthe
  * @param score le score a afficher
  */
-void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score, char *nomLaby, Monstre *tabMonstres, int tailleTabMonstres)
+void afficher_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes, int score, char *nomLaby, Monstre *tabMonstres, int tailleTabMonstres, SDL_Surface *ecran, InterfaceCreationLaby iCreation)
 {
-    printf("\n--NOUVELLE PARTIE-----------------------------------------------------------\n\n");
-    printf("\t%s\n\n", nomLaby);
-    size_t i, j;
+    SDL_Surface *mur = NULL;
+    SDL_Surface *solution = NULL;
+    SDL_Surface *tresor = NULL;
+    SDL_Surface *joueur = NULL;
+    SDL_Surface *piege = NULL;
+    SDL_Surface *fantome = NULL;
+    SDL_Surface *leprechaun = NULL;
+
+    SDL_Rect positionCase;
+
+    positionCase.x = 50;
+    positionCase.y = 50;
+
     char typeMonstre;
+
+    mur = IMG_Load("images/mur.png");
+    joueur = IMG_Load("images/kenny.png");
+    solution = IMG_Load("images/solutionIcone.png");
+    tresor = IMG_Load("images/tresor.png");
+    piege = IMG_Load("images/piege.png");
+    fantome = IMG_Load("images/fantome.png");
+    leprechaun = IMG_Load("images/leprechaun.png");
+
+    size_t i, j;
+
+    SDL_BlitSurface(iCreation.imageDeFond2, NULL, ecran, &iCreation.positionImageDeFond2);
+    SDL_BlitSurface(iCreation.retourMenu, NULL, ecran, &iCreation.positionRetourMenu);
+
     for(i = 0; i < nbLignes; i++)
     {
-        printf("\t");
         for(j = 0; j < nbColonnes; j++)
         {
+            if(laby[nbColonnes * i + j] == 'o')
+            {
+                SDL_BlitSurface(joueur, NULL, ecran, &positionCase);
+            }
+            if(laby[nbColonnes * i + j] == '#')
+            {
+                SDL_BlitSurface(mur, NULL, ecran, &positionCase);
+            }
+            if(laby[nbColonnes * i + j] == 'b')
+            {
+                SDL_BlitSurface(tresor, NULL, ecran, &positionCase);
+            }
+            if(laby[nbColonnes * i + j] == 'm')
+            {
+                SDL_BlitSurface(piege, NULL, ecran, &positionCase);
+            }
             typeMonstre = rechercher_monstre(i, j, tabMonstres, tailleTabMonstres);
             if(typeMonstre != 'n' && laby[nbColonnes * i + j] != 'o')
             {
-                printf("%c", typeMonstre);
+                if(typeMonstre == 'f')
+                {
+                    SDL_BlitSurface(fantome, NULL, ecran, &positionCase);
+                }
+                else
+                {
+                    SDL_BlitSurface(leprechaun, NULL, ecran, &positionCase);
+                }
+
             }
-            else
-            {
-                printf("%c", laby[nbColonnes * i + j]);
-            }
+            positionCase.x += 30;
         }
-        printf("\n");
+        positionCase.x = 50;
+        positionCase.y += 30;
     }
-    printf("\n\040\040[AIDE]:\n");
-    printf("\t'f' pour quitter la partie\n\n");
-    printf("--RESULTATS-----------------------------------------------------------------\n\n");
-    printf("\tVotre SCORE    : %d\n", score);
+
+    SDL_Flip(ecran);
     return;
-}
-
-/**
- * Affiche le menu d'accueil
- * @return 1 si le joueur decide de jouer, 0 sinon
- */
-int afficher_accueil()
-{
-    printf("################################################\n");
-    printf("################################################\n");
-    printf("###                                          ###\n");
-    printf("###                                          ###\n");
-    printf("###    ##          #      #####     ##  ##   ###\n");
-    printf("###    ##          #      ##  ##     ####    ###\n");
-    printf("###    ##         # #     ######      ##     ###\n");
-    printf("###    ##        #####    ##  ##      ##     ###\n");
-    printf("###    ######   ##   ##   #####       ##     ###\n");
-    printf("###                                          ###\n");
-    printf("###                1. Jouer                  ###\n");
-    printf("###                2. Quitter                ###\n");
-    printf("###                                          ###\n");
-    printf("###                                          ###\n");
-    printf("### (c)Copyrights R.Kos - ENSICAEN 2012-2013 ###\n");
-    printf("###                                          ###\n");
-    printf("################################################\n");
-    printf("################################################\n");
-
-
-
-    /*printf("       _/\n");
-    printf("      _/          _/_/_/  _/      _/      _/    _/_/_/  _/_/_/_/    _/_/_/\n");
-    printf("     _/        _/    _/  _/      _/      _/  _/    _/  _/        _/    _/\n");
-    printf("    _/        _/    _/    _/  _/  _/  _/    _/    _/  _/        _/    _/\n");
-    printf("   _/_/_/_/    _/_/_/      _/      _/        _/_/_/  _/          _/_/_/\n");*/
-    int touche = 'o';
-    while(touche!='2' && touche!='1')
-    {
-            touche = getch();
-    }
-    if(touche == '2')
-    {
-        return 0;
-    }
-    return 1;
-
 }
 
 /**
  * Affiche le menu principal
  */
+ /*
 void afficher_menu()
 {
     FILE* fichier = NULL;
@@ -146,17 +146,10 @@ void afficher_menu()
             printf("---------------------------------------------------------------------------\n");
             printf("Entrez un numero : ");
             scanf("%d", &choix_menu);
-
-            /*if(choix_menu < 1 || choix_menu > 5)
-            {
-                printf("INFO : Choix incorrecte !\n");
-            }*/
         }
         while(choix_menu < 1 || choix_menu > 5);
 
         clear();
-        //memset(&nomFichier[0], 0, sizeof(nomFichier));
-        //memset(&nomLaby[0], 0, sizeof(nomLaby));
 
         if(choix_menu == 1)
         {
@@ -371,3 +364,4 @@ void afficher_menu()
     }
     return;
 }
+*/
