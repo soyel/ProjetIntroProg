@@ -26,5 +26,4 @@
         resetTermios();
         return ch;
     }
-
 #endif

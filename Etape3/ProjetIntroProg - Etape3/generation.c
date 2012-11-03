@@ -49,6 +49,23 @@ void ajouterEnfinDeListe(chemin lesChemins, cellule* leChemin)
  */
 void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
 {
+    int compteurAleatoire;
+    int coordXTmp, coordYTmp;
+    int coordXPremCell, coordYPremCell;
+    int coordXSecCell, coordYSecCell;
+    int idPremCell, idSecCell;
+    int cellDominante, cell1, cell2;
+
+    cellule* cellule1 = NULL;
+    cellule* cellule2 = NULL;
+    cellule* tmpDebutChemin = NULL;
+    cellule* tmpCelluleSuivante = NULL;
+
+    int compteurCelluleVide = 0;
+    int celluleAleatoire;
+    int typeBonusMalus;
+    char bonusMalus = 'o';
+
     int compteurCell = 1;
     int compteurMur = 1;
     int nbMurs = ((nbLignes * nbColonnes) - (nbColonnes * 2) - ((nbLignes-2)*2))/2;
@@ -58,6 +75,10 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
 
     chemin tabDesChemins[nbLignes][nbColonnes];
     struct coordonneesMurs mesMurs[nbMurs];
+
+    double nbElementsCarte;
+    int nbMonstres;
+    int nbBonusMalus;
 
     for(i = 0; i<nbLignes; ++i)
     {
@@ -103,17 +124,6 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
     }
 
     compteurMur = nbMurs;
-    int compteurAleatoire;
-    int coordXTmp, coordYTmp;
-    int coordXPremCell, coordYPremCell;
-    int coordXSecCell, coordYSecCell;
-    int idPremCell, idSecCell;
-    int cellDominante, cell1, cell2;
-
-    cellule* cellule1 = NULL;
-    cellule* cellule2 = NULL;
-    cellule* tmpDebutChemin = NULL;
-    cellule* tmpCelluleSuivante = NULL;
     while(compteurMur > 0)
     {
         compteurAleatoire = rand()%compteurMur;
@@ -181,14 +191,9 @@ void creer_labyrinthe(char *laby, size_t nbLignes, size_t nbColonnes)
         compteurMur -= 1;
     }
 
-    int compteurCelluleVide = 0;
-    int celluleAleatoire;
-    int typeBonusMalus;
-    char bonusMalus = 'o';
-
-    double nbElementsCarte = (10 * (double)nbLignes * (double)nbColonnes) / 100;
-    int nbMonstres = (int)nbElementsCarte / 4;
-    int nbBonusMalus = (int)nbElementsCarte / 2;
+    nbElementsCarte = (10 * (double)nbLignes * (double)nbColonnes) / 100;
+    nbMonstres = (int)nbElementsCarte / 4;
+    nbBonusMalus = (int)nbElementsCarte / 2;
 
     Coordonnees toutesCellulesVides[(nbLignes - 2)*(nbColonnes - 2)];
     for(i = 0; i < nbLignes; i++)

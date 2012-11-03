@@ -11,25 +11,12 @@
 #include "jeu.h"
 #include "generation.h"
 #include "affichage.h"
-
-typedef struct
-{
-    char nomL[31]; // on autorise un nom de 23 caractère
-    char nbLignes[3];
-    char nbColonnes[3];
-    int enSaisie;
-    int indice;
-    int valide;
-} Saisie;
+#include "tools.h"
 
 
 void afficher_titre_menu(SDL_Surface *ecran, int fichierCharge, char *nomFichier);
-void initSaisie(Saisie *saisie);
-void saisirCaractere(Saisie *saisie, char caractere, int positionEntree);
-void finSaisie(Saisie *saisie, int *positionEntree, SDL_Rect *positionIndex);
 Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby, int *entreesV);
-char *recuperer_partie_texte(Saisie saisie, int positionEntree);
-void effacerCaractere(Saisie *saisie);
+
 Saisie fenetre_chargement_fichier(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby);
 void afficher_liste_fichiers(SDL_Surface *ecran);
 
@@ -42,6 +29,13 @@ int main(int argc, char *argv[])
     SDL_Surface *boutonQuitter = NULL;
     SDL_Surface *fleche = NULL;
     SDL_Surface *retourMenu = NULL;
+    SDL_Surface *recommencerLabel = NULL;
+
+    SDL_Rect positionRecommencer;
+
+    recommencerLabel = IMG_Load("images/recommencer.png");
+    positionRecommencer.x = 350;
+    positionRecommencer.y = 350;
 
     SDL_Rect positionFond;
 
@@ -52,11 +46,11 @@ int main(int argc, char *argv[])
     SDL_Rect positionRetourMenu;
 
 
-    positionBoutonJouer.x = 360;
-    positionBoutonJouer.y = 450;
+    positionBoutonJouer.x = 410;
+    positionBoutonJouer.y = 590;
 
-    positionBoutonQuitter.x = 615;
-    positionBoutonQuitter.y = 450;
+    positionBoutonQuitter.x = 665;
+    positionBoutonQuitter.y = 590;
 
 
 
@@ -76,8 +70,6 @@ int main(int argc, char *argv[])
     FMOD_System_Create(&system);
     FMOD_System_Init(system, 32, FMOD_INIT_NORMAL, NULL);
 
-    resultat = FMOD_System_CreateSound(system, "start.wav", FMOD_CREATESAMPLE, 0, &start);
-    resultat2 = FMOD_System_CreateSound(system, "click.mp3", FMOD_CREATESAMPLE, 0, &click);
 
     SDL_Event event;
 
@@ -93,7 +85,7 @@ int main(int argc, char *argv[])
     SDL_Color couleurBlanche = {255, 255, 255} ;
 
     SDL_WM_SetIcon(SDL_LoadBMP("images/laby.bmp"), NULL); //icone
-    ecran = SDL_SetVideoMode(1100, 700, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); // Ouverture de la fenêtre
+    ecran = SDL_SetVideoMode(1200, 850, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); // Ouverture de la fenêtre
     SDL_WM_SetCaption("LA'WARA", NULL); //titre
 
     imageDeFond = IMG_Load("images/bg.png");
@@ -139,6 +131,7 @@ int main(int argc, char *argv[])
     iCreationLaby.positionRetourMenu.y = 8;
     iCreationLaby.positionImageDeFond2.x = 0;
     iCreationLaby.positionImageDeFond2.y = 0;
+
     while (continuer) /* TANT QUE la variable ne vaut pas 0 */
     {
         SDL_WaitEvent(&event); /* On attend un événement qu'on récupère dans event */
@@ -152,6 +145,9 @@ int main(int argc, char *argv[])
                 {
                     case SDLK_ESCAPE: /* Appui sur la touche Echap, on arrête le programme */
                         continuer = 0;
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -175,8 +171,8 @@ int main(int argc, char *argv[])
                         afficher_titre_menu(ecran, fichierCharge, nomFichier);
 
                         fleche = IMG_Load("images/fleche.png");
-                        positionFleche.x = 210;
-                        positionFleche.y = 220;
+                        positionFleche.x = 250;
+                        positionFleche.y = 280;
 
                         SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
                         SDL_Flip(ecran);
@@ -194,22 +190,12 @@ int main(int argc, char *argv[])
                                     if (event.key.keysym.sym == SDLK_ESCAPE)
                                     {
                                             continuer = 0;
-                                            break;
+
                                     }
+                                    break;
                                 case SDL_MOUSEMOTION:
                                     /* SOURIS SUR "CREER UN LABYRINTHE" */
-                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 220 && event.motion.y <= 280)
-                                    {
-                                        SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
-
-                                        afficher_titre_menu(ecran, fichierCharge, nomFichier);
-                                        positionFleche.y = 220;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
-
-                                        SDL_Flip(ecran);
-                                    }
-                                    /* SOURIS SUR "CHARGER UN LABYRINTHE" */
-                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 280 && event.motion.y <= 340)
+                                    if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 280 && event.motion.y <= 350)
                                     {
                                         SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
 
@@ -219,46 +205,75 @@ int main(int argc, char *argv[])
 
                                         SDL_Flip(ecran);
                                     }
-                                    /* SOURIS SUR "JOUER LA PARTIE*/
-                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 340 && event.motion.y <= 400 && fichierCharge)
+                                    /* SOURIS SUR "CHARGER UN LABYRINTHE" */
+                                    if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 350 && event.motion.y <= 420)
                                     {
                                         SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
 
                                         afficher_titre_menu(ecran, fichierCharge, nomFichier);
-                                        positionFleche.y = 340;
+                                        positionFleche.y = 350;
                                         SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
 
                                         SDL_Flip(ecran);
                                     }
-                                    /* SOURIS SUR "AFFICHER LA SOLUTION" */
-                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 400 && event.motion.y <= 460 && fichierCharge)
+                                    if(fichierCharge)
                                     {
-                                        SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+                                        /* SOURIS SUR "JOUER LA PARTIE*/
+                                        if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 420 && event.motion.y <= 490 && fichierCharge)
+                                        {
+                                            SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
 
-                                        afficher_titre_menu(ecran, fichierCharge, nomFichier);
-                                        positionFleche.y = 400;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+                                            afficher_titre_menu(ecran, fichierCharge, nomFichier);
+                                            positionFleche.y = 420;
+                                            SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
 
-                                        SDL_Flip(ecran);
+                                            SDL_Flip(ecran);
+                                        }
+                                        /* SOURIS SUR "AFFICHER LA SOLUTION" */
+                                        if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 490 && event.motion.y <= 560 && fichierCharge)
+                                        {
+                                            SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+
+                                            afficher_titre_menu(ecran, fichierCharge, nomFichier);
+                                            positionFleche.y = 490;
+                                            SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+
+                                            SDL_Flip(ecran);
+                                        }
+                                        /* SOURIS SUR "QUITTER LE JEU" */
+                                        if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 560 && event.motion.y <= 630)
+                                        {
+                                            SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+
+                                            afficher_titre_menu(ecran, fichierCharge, nomFichier);
+                                            positionFleche.y = 560;
+                                            SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+
+                                            SDL_Flip(ecran);
+                                        }
                                     }
-                                    /* SOURIS SUR "QUITTER LE JEU" */
-                                    if(event.motion.x >= 300 && event.motion.x <= 842 && event.motion.y >= 460 && event.motion.y <= 520)
+                                    else
                                     {
-                                        SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+                                        /* SOURIS SUR "QUITTER LE JEU" */
+                                        if(event.motion.x >= 350 && event.motion.x <= 892 && event.motion.y >= 420 && event.motion.y <= 490)
+                                        {
+                                            SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
 
-                                        afficher_titre_menu(ecran, fichierCharge, nomFichier);
-                                        positionFleche.y = 460;
-                                        SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
+                                            afficher_titre_menu(ecran, fichierCharge, nomFichier);
+                                            positionFleche.y = 420;
+                                            SDL_BlitSurface(fleche, NULL, ecran, &positionFleche);
 
-                                        SDL_Flip(ecran);
+                                            SDL_Flip(ecran);
+                                        }
                                     }
+                                    break;
                                 case SDL_MOUSEBUTTONUP:
                                     if (event.button.button == SDL_BUTTON_LEFT)
                                     {
                                         /* ************************/
                                         /* SI ON APPUI SUR CREER  */
                                         /* ************************/
-                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 220 && event.button.y < 280)
+                                        if(event.button.x > 350 && event.button.x < 892 && event.button.y > 280 && event.button.y < 350)
                                         {
 
                                             int entreeValidees = 1;
@@ -311,7 +326,7 @@ int main(int argc, char *argv[])
                                          /* ************************/
                                         /* SI ON APPUI SUR CHARGER */
                                         /* ************************/
-                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 280 && event.button.y < 340)
+                                        if(event.button.x > 350 && event.button.x < 892 && event.button.y > 350 && event.button.y < 420)
                                         {
                                             FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
                                             SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
@@ -325,7 +340,6 @@ int main(int argc, char *argv[])
                                             Saisie maSaisie;
                                             maSaisie = fenetre_chargement_fichier(ecran, iCreationLaby);
                                             SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
-
                                             strcpy(nomLaby, maSaisie.nomL);
                                             strcpy(nomFichier, nomLaby);
                                             strcat(nomFichier, ".init");
@@ -346,14 +360,14 @@ int main(int argc, char *argv[])
 
 
                                         }
-                                        /* ************************/
-                                        /* SI ON APPUI SUR JOUER  */
-                                        /* ************************/
-                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 340 && event.button.y < 400)
+                                        if(fichierCharge)
                                         {
-                                            char chaine[10];
-                                            if(fichierCharge)
+                                            /* ************************/
+                                            /* SI ON APPUI SUR JOUER  */
+                                            /* ************************/
+                                            if(event.button.x > 350 && event.button.x < 892 && event.button.y > 420 && event.button.y < 490)
                                             {
+                                                char chaine[10];
                                                 fichier = fopen(nomFichier, "r");
 
                                                 if (fichier != NULL)
@@ -374,10 +388,60 @@ int main(int argc, char *argv[])
                                                     FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
 
                                                     jouer(&(laby[0][0]), N, M, nomLaby, ecran, iCreationLaby);
+
+                                                    fclose(fichier);
+                                                    int continuerJouer = 1;
+
+                                                    SDL_BlitSurface(recommencerLabel, NULL, ecran, &positionRecommencer);
+                                                    SDL_Flip(ecran);
+                                                    while(continuerJouer)
+                                                    {
+                                                        SDL_WaitEvent(&event);
+                                                        switch(event.type)
+                                                        {
+                                                            case SDL_MOUSEBUTTONUP:
+                                                                if (event.button.button == SDL_BUTTON_LEFT)
+                                                                {
+                                                                    if(event.button.x > 690 && event.button.x < 745 && event.button.y > 445 && event.button.y < 470)
+                                                                    {
+                                                                        SDL_BlitSurface(recommencerLabel, NULL, ecran, &positionRecommencer);
+                                                                        SDL_Flip(ecran);
+                                                                        fichier = fopen(nomFichier, "r");
+
+                                                                        if (fichier != NULL)
+                                                                        {
+                                                                            memset(&chaine[0], 0, sizeof(chaine));
+                                                                            fgets(chaine, 10, fichier);
+                                                                            nbLignes = atoi(chaine);
+
+                                                                            memset(&chaine[0], 0, sizeof(chaine));
+                                                                            fgets(chaine, 10, fichier);
+                                                                            nbColonnes = atoi(chaine);
+
+                                                                            char laby [nbLignes][nbColonnes];
+                                                                            size_t N = sizeof(laby) / sizeof(laby[0]), M = sizeof(laby[0]) / sizeof(laby[0][0]);
+
+                                                                            lire_fichier_labyrinthe(fichier, &(laby[0][0]), N, M);
+
+                                                                            FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
+
+                                                                            jouer(&(laby[0][0]), N, M, nomLaby, ecran, iCreationLaby);
+
+                                                                            SDL_BlitSurface(recommencerLabel, NULL, ecran, &positionRecommencer);
+                                                                            SDL_Flip(ecran);
+                                                                            fclose(fichier);
+                                                                        }
+                                                                    }
+                                                                    if(event.button.x > 430 && event.button.x < 500 && event.button.y > 445 && event.button.y < 470)
+                                                                    {
+                                                                        continuerJouer = 0;
+                                                                    }
+                                                                }
+                                                        }
+                                                    }
                                                     SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
                                                     afficher_titre_menu(ecran, fichierCharge, nomFichier);
                                                     SDL_Flip(ecran);
-                                                    fclose(fichier);
                                                 }
                                                 else
                                                 {
@@ -386,13 +450,10 @@ int main(int argc, char *argv[])
                                                     memset(&nomLaby[0], 0, sizeof(nomLaby));
                                                 }
                                             }
-                                        }
-                                        /* *************************/
-                                        /* SI ON APPUIE SUR AFF SOL*/
-                                        /* *************************/
-                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 400 && event.button.y < 460 )
-                                        {
-                                            if(fichierCharge)
+                                            /* *************************/
+                                            /* SI ON APPUIE SUR AFF SOL*/
+                                            /* *************************/
+                                            if(event.button.x > 350 && event.button.x < 892 && event.button.y > 490 && event.button.y < 560 )
                                             {
                                                 char chaine[10];
                                                 fichier = fopen(nomFichier, "r");
@@ -442,6 +503,7 @@ int main(int argc, char *argv[])
                                                                     case SDLK_ESCAPE:
                                                                         continuerAffichageSolution = 0;
                                                                         break;
+                                                                    default: break;
                                                                 }
                                                         }
                                                     }
@@ -458,16 +520,28 @@ int main(int argc, char *argv[])
                                                     memset(&nomLaby[0], 0, sizeof(nomLaby));
                                                 }
                                             }
+                                            /* *************************/
+                                            /* SI ON APPUIE SUR QUITTER*/
+                                            /* *************************/
+                                            if(event.button.x > 350 && event.button.x < 892 && event.button.y > 560 && event.button.y < 630 )
+                                            { //si on click gauche sur 'quitter'
+                                                FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
+                                                continuer = 0;
+                                            }
                                         }
-                                        /* *************************/
-                                        /* SI ON APPUIE SUR QUITTER*/
-                                        /* *************************/
-                                        if(event.button.x > 300 && event.button.x < 842 && event.button.y > 460 && event.button.y < 520 )
-                                        { //si on click gauche sur 'quitter'
-                                            FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
-                                            continuer = 0;
+                                        else
+                                        {
+                                            /* *************************/
+                                            /* SI ON APPUIE SUR QUITTER*/
+                                            /* *************************/
+                                            if(event.button.x > 350 && event.button.x < 892 && event.button.y > 420 && event.button.y < 490)
+                                            { //si on click gauche sur 'quitter'
+                                                FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, click, 0, NULL);
+                                                continuer = 0;
+                                            }
                                         }
                                     }
+                                    break;
                             }
                         }
                     }
@@ -503,34 +577,38 @@ void afficher_titre_menu(SDL_Surface *ecran, int fichierCharge, char *nomFichier
     SDL_Rect positionQuitterJeu;
     SDL_Rect positionTitre;
 
+    int premierElementY = 280;
     titre = IMG_Load("images/titre.png");
     positionTitre.x = ecran->w / 2 - titre->w / 2;
     positionTitre.y = 10;
 
     SDL_BlitSurface(titre, NULL, ecran, &positionTitre);
     creerPartie = IMG_Load("images/creerLaby.png");
-    positionCreerPartie.x = 300;
-    positionCreerPartie.y = 220;
+    positionCreerPartie.x = 350;
+    positionCreerPartie.y = premierElementY;
 
     SDL_BlitSurface(creerPartie, NULL, ecran, &positionCreerPartie);
 
     chargerPartie = IMG_Load("images/chargerLaby.png");
-    positionChargerPartie.x = 300;
-    positionChargerPartie.y = 280;
+    positionChargerPartie.x = 350;
+    premierElementY += 70;
+    positionChargerPartie.y = premierElementY;
 
     SDL_BlitSurface(chargerPartie, NULL, ecran, &positionChargerPartie);
 
     if(fichierCharge)
     {
         jouerClassement = IMG_Load("images/jouerPartie.png");
-        positionJouerClassement.x = 300;
-        positionJouerClassement.y = 340;
+        positionJouerClassement.x = 350;
+        premierElementY += 70;
+        positionJouerClassement.y = premierElementY;
 
         SDL_BlitSurface(jouerClassement, NULL, ecran, &positionJouerClassement);
 
         trouverSolution = IMG_Load("images/afficherSolution.png");
-        positionTrouverSolution.x = 300;
-        positionTrouverSolution.y = 400;
+        positionTrouverSolution.x = 350;
+        premierElementY += 70;
+        positionTrouverSolution.y = premierElementY;
 
         SDL_BlitSurface(trouverSolution, NULL, ecran, &positionTrouverSolution);
 
@@ -539,8 +617,9 @@ void afficher_titre_menu(SDL_Surface *ecran, int fichierCharge, char *nomFichier
     }
 
     quitterJeu = IMG_Load("images/quitterJeu.png");
-    positionQuitterJeu.x = 300;
-    positionQuitterJeu.y = 460;
+    positionQuitterJeu.x = 350;
+    premierElementY += 70;
+    positionQuitterJeu.y = premierElementY;
 
     SDL_BlitSurface(quitterJeu, NULL, ecran, &positionQuitterJeu);
 
@@ -715,6 +794,9 @@ Saisie fenetre_chargement_fichier(SDL_Surface *ecran, InterfaceCreationLaby iCre
                         effacerCaractere(p_saisie);
                         chaineT = recuperer_partie_texte(saisie, 1);
                         nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        break;
+
+                    default: break;
 
                 }
                 if (*p_vide < 2)
@@ -742,7 +824,6 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby,
     Saisie *p_saisie = &saisie;
     initSaisie(p_saisie);
     int continuerSaisie = 1;
-    int positionEntree = 1;
     SDL_Surface *nomLaby;
     SDL_Surface *nbL;
     SDL_Surface *nbC;
@@ -887,6 +968,8 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby,
                         if(*entreesV == 1) nomLaby = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         if(*entreesV == 2) nbL = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
                         if(*entreesV == 3) nbC = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        break;
+                    default: break;
 
                 }
                 if (*entreesV < 4)
@@ -910,105 +993,4 @@ Saisie recuperer_entree(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby,
     TTF_CloseFont(police);
     TTF_Quit();
     return saisie;
-}
-
-void initSaisie(Saisie *saisie)
-{
-    saisie->enSaisie = 1;  // pour dire que l'on est en train de saisir
-    saisie->indice = 0; // on en est au premier caractère.
-    saisie->valide = 0;
-}
-
-void saisirCaractere(Saisie *saisie, char caractere, int positionEntree)
-{
-    int index = saisie->indice;
-    int chiffre;
-    if(positionEntree == 1)
-    {
-        if(index < 31)
-        {
-            saisie->nomL[saisie->indice] = caractere;
-            saisie->indice = saisie->indice + 1;
-        }
-    }
-    if(positionEntree == 2)
-    {
-        if(index < 2 && isdigit(caractere) )
-        {
-            saisie->nbLignes[saisie->indice] = caractere;
-            saisie->indice = saisie->indice + 1;
-        }
-    }
-    if(positionEntree == 3)
-    {
-        if(index < 2 && isdigit(caractere))
-        {
-            saisie->nbColonnes[saisie->indice] = caractere;
-            saisie->indice = saisie->indice + 1;
-        }
-    }
-
-}
-
-void effacerCaractere(Saisie *saisie)
-{
-    if(saisie->indice != 0)
-    {
-        saisie->indice = saisie->indice - 1;
-    }
-}
-void finSaisie(Saisie *saisie, int *positionEntree, SDL_Rect *positionIndex)
-{
-    int chiffre;
-    int positionE = *positionEntree;
-    if(saisie->indice != 0)
-    {
-        if(positionE == 1)
-        {
-
-            saisie->nomL[saisie->indice] = 0; // le 0 terminal
-            *positionEntree += 1;
-            positionIndex->y += 80;
-        }
-        if(positionE == 2)
-        {
-            chiffre = atoi(saisie->nbLignes);
-            if(chiffre >= 5 && chiffre % 2 != 0)
-            {
-                saisie->nbLignes[saisie->indice] = 0; // le 0 terminal
-                *positionEntree += 1;
-                positionIndex->y += 80;
-            }
-        }
-        if(positionE == 3)
-        {
-            chiffre = atoi(saisie->nbLignes);
-            if(chiffre >= 5 && chiffre % 2 != 0)
-            {
-                saisie->nbLignes[saisie->indice] = 0; // le 0 terminal
-                *positionEntree += 1;
-                positionIndex->y += 80;
-            }
-        }
-        saisie->indice = 0;
-    }
-}
-
-char *recuperer_partie_texte(Saisie saisie, int positionEntree)
-{
-    int tailleSaisie = saisie.indice;
-    char *chaineTemporaire = NULL;
-    chaineTemporaire = malloc(sizeof(int) * tailleSaisie);
-
-    int i;
-
-    for(i = 0; i < tailleSaisie; i++)
-    {
-        if(positionEntree == 1) chaineTemporaire[i] = saisie.nomL[i];
-        if(positionEntree == 2) chaineTemporaire[i] = saisie.nbLignes[i];
-        if(positionEntree == 3) chaineTemporaire[i] = saisie.nbColonnes[i];
-
-    }
-    chaineTemporaire[i] = 0;
-    return chaineTemporaire;
 }

@@ -4,16 +4,7 @@
 
 #include "affichage.h"
 
-void vider_buffer(void)
-{
-    int c = 0;
-    while (c != '\n' && c != EOF)
-    {
-        c = getchar();
-    }
-}
-
-int main(int argc, char *argv[])
+int main(void)
 {
     int choix_utilisateur;
 

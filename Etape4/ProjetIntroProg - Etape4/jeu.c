@@ -4,10 +4,11 @@
 #include <string.h>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
 #include "jeu.h"
 #include "affichage.h"
-
+#include "tools.h"
 
 int positionActuelle_X = 1;
 int positionActuelle_Y = 0;
@@ -66,7 +67,154 @@ int verifier_position_gagnante(size_t nbLignes, size_t nbColonnes)
     }
     return 0;
 }
+Saisie recuperer_nom_score(SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
+{
+    SDL_Event eventSaisie;
 
+    Saisie saisie;
+    Saisie *p_saisie = &saisie;
+    initSaisie(p_saisie);
+
+    SDL_Surface *nomJoueur;
+    SDL_Surface *labelEnregistrement;
+    SDL_Rect positionLabelEnregistrement;
+    SDL_Rect positionNomJoueur;
+
+    positionLabelEnregistrement.x = 350;
+    positionLabelEnregistrement.y = 300;
+    positionNomJoueur.x = 605;
+    positionNomJoueur.y = 365;
+
+    labelEnregistrement = IMG_Load("images/saveName.png");
+
+    TTF_Init();
+    SDL_Color couleurBlanche = {255, 255, 255};
+    TTF_Font *police = NULL;
+    police = TTF_OpenFont("times.ttf", 24);
+    nomJoueur = TTF_RenderText_Blended(police, "", couleurBlanche);
+
+    int continuerSaisie = 1;
+    int entierVide = 1;
+    int *p_vide = &entierVide;
+    char caractereAinverser;
+    char *chaineT;
+
+    SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+    SDL_BlitSurface(labelEnregistrement, NULL, ecran, &positionLabelEnregistrement);
+    SDL_Flip(ecran);
+
+    while(continuerSaisie)
+    {
+        SDL_WaitEvent(&eventSaisie);
+        switch(eventSaisie.type)
+        {
+            case SDL_KEYDOWN:
+                switch (eventSaisie.key.keysym.sym ) // on teste quelle touche a été enfoncée
+                {
+                    case SDLK_a:
+                        if (saisie.indice < 11)
+                        {
+                            caractereAinverser = 'q';
+                            saisirCaractere(p_saisie, toupper(caractereAinverser), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+                    case SDLK_w:
+                        if (saisie.indice < 11)
+                        {
+                            caractereAinverser = 'z';
+                            saisirCaractere(p_saisie, toupper(caractereAinverser), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+                    case SDLK_z:
+                        if (saisie.indice < 11)
+                        {
+                            caractereAinverser = 'w';
+                            saisirCaractere(p_saisie, toupper(caractereAinverser), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+                    case SDLK_q:
+                        if (saisie.indice < 11)
+                        {
+                            caractereAinverser = 'a';
+                            saisirCaractere(p_saisie, toupper(caractereAinverser), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+                    case SDLK_SEMICOLON:
+                        if (saisie.indice < 11){
+                            caractereAinverser = 'm';
+                            saisirCaractere(p_saisie, toupper(caractereAinverser), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+                    case SDLK_b:
+                    case SDLK_c:
+                    case SDLK_d:
+                    case SDLK_e:
+                    case SDLK_f:
+                    case SDLK_g:
+                    case SDLK_h:
+                    case SDLK_i:
+                    case SDLK_j:
+                    case SDLK_k:
+                    case SDLK_l:
+                    case SDLK_m:
+                    case SDLK_n:
+                    case SDLK_o:
+                    case SDLK_p:
+                    case SDLK_r:
+                    case SDLK_s:
+                    case SDLK_t:
+                    case SDLK_u:
+                    case SDLK_v:
+                    case SDLK_x:
+                    case SDLK_y:
+                        if (saisie.indice < 11)
+                        {
+                            saisirCaractere(p_saisie, toupper((char)eventSaisie.key.keysym.sym), 1);
+                            chaineT = recuperer_partie_texte(saisie, 1);
+                            nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        }
+                        break;
+
+                    case SDLK_RETURN:
+                        if(saisie.indice != 0)
+                        {
+                            saisie.nomL[saisie.indice] = 0;
+                            saisie.enSaisie = 0;
+                            saisie.valide = 1;
+                            continuerSaisie = 0;
+                        }
+                        break;
+
+                    case SDLK_BACKSPACE:
+                        effacerCaractere(p_saisie);
+                        chaineT = recuperer_partie_texte(saisie, 1);
+                        nomJoueur = TTF_RenderText_Blended(police, chaineT, couleurBlanche);
+                        break;
+
+                    default: break;
+                }
+
+                SDL_BlitSurface(iCreationLaby.imageDeFond2, NULL, ecran, &iCreationLaby.positionImageDeFond2);
+                SDL_BlitSurface(labelEnregistrement, NULL, ecran, &positionLabelEnregistrement);
+                SDL_BlitSurface(nomJoueur, NULL, ecran, &positionNomJoueur);
+                SDL_Flip(ecran);
+                break;
+        }
+    }
+    TTF_CloseFont(police);
+    TTF_Quit();
+    return saisie;
+}
 /**
  * Vérifie si le joueur a établi un score meilleur à ceux déjà enregistrés.
  * Dans ce cas là, il place son score dans un tableau de scores
@@ -74,9 +222,10 @@ int verifier_position_gagnante(size_t nbLignes, size_t nbColonnes)
  * @param nbScore le nombre de scores déjà enregistrés, soit la taille du tableau
  * @param scoreAenregistrer le score à enregistrer, avec le nom du joueur, ainsi que son score
  */
-void verifier_position_score(scoreJoueur* tableauScores, int *nbScore, scoreJoueur scoreAenregistrer)
+void verifier_position_score(scoreJoueur *tableauScores, int *nbScore, scoreJoueur scoreAenregistrer, SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby)
 {
     int i;
+    Saisie saisie;
     for(i = *nbScore; i > 0 && tableauScores[i - 1].score < scoreAenregistrer.score; i--)
     {
         tableauScores[i] = tableauScores[i - 1];
@@ -87,10 +236,13 @@ void verifier_position_score(scoreJoueur* tableauScores, int *nbScore, scoreJoue
     }
     if(i != 10)
     {
+        /*
         printf("\n---------------------------------------------------------------------------\n");
         printf("\n\tBravo! Votre score va etre enregistre !\n");
         printf("\tEntrez votre nom : ");
-        scanf("%s", scoreAenregistrer.nomJoueur);
+        scanf("%s", scoreAenregistrer.nomJoueur);*/
+        saisie = recuperer_nom_score(ecran, iCreationLaby);
+        strcpy(scoreAenregistrer.nomJoueur, saisie.nomL);
         tableauScores[i] = scoreAenregistrer;
     }
 }
@@ -126,7 +278,7 @@ char rechercher_monstre(int x, int y, Monstre *tabMonstres, int tailleTabMonstre
  * @param directionY l'ordonnée de la direction
  * @param score le score du joueur
  */
-void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe, Monstre *tabMonstres, int tailleTabM, SDL_Surface *ecran, InterfaceCreationLaby iCreation)
+void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, int directionY, int *score, char *nomLabyrinthe, Monstre *tabMonstres, int tailleTabM, SDL_Surface *ecran, InterfaceCreationLaby iCreation, int temps)
 {
     if(verifier_possibilite(laby, nbColonnes, directionX, directionY) == 1)
     {
@@ -135,7 +287,7 @@ void deplacer(char *laby, size_t nbLignes, size_t nbColonnes, int directionX, in
         positionActuelle_X += directionX;
         positionActuelle_Y += directionY;
         laby[nbColonnes * positionActuelle_X + positionActuelle_Y] = 'o';
-        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe, tabMonstres, tailleTabM, ecran, iCreation);
+        afficher_labyrinthe(laby, nbLignes, nbColonnes, *score, nomLabyrinthe, tabMonstres, tailleTabM, ecran, iCreation, temps);
     }
     return;
 }
@@ -408,7 +560,7 @@ void trouver_chemin_de_sortie(char *laby, size_t nbLignes, size_t nbColonnes, SD
  * @param score le score effectué par le joueur
  * @param nomLaby le nom du labyrinthe
  */
-void enregistrer_topscore(int score, char *nomLaby)
+void enregistrer_topscore(int scoreTotal, char *nomLaby, SDL_Surface *ecran, InterfaceCreationLaby iCreationLaby, char *laby, size_t nbLignes, size_t nbColonnes, Monstre *tabMonstres, int tailleTabMonstres, int temps, int score)
 {
     char nomFichier[31];
     char chaineTemporaire[31];
@@ -420,6 +572,25 @@ void enregistrer_topscore(int score, char *nomLaby)
     int nbScore = 0;
     int position_caractere = 0;
 
+    SDL_Surface *labelNomJoueur = NULL;
+    SDL_Surface *labelScoreJoueur = NULL;
+    SDL_Rect positionLabelNomJoueur;
+    SDL_Rect positionLabelScoreJoueur;
+    positionLabelNomJoueur.x = 952;
+    positionLabelNomJoueur.y = 120;
+    positionLabelScoreJoueur.x = 1125;
+    positionLabelScoreJoueur.y = 120;
+    Saisie saisie;
+
+    TTF_Init();
+    SDL_Color couleurBlanche = {255, 0, 0};
+
+    TTF_Font *police = NULL;
+
+    police = TTF_OpenFont("times.ttf", 19);
+
+    char chaineTemporaire2[8];
+
     strcpy(nomFichier, nomLaby);
     strcat(nomFichier, ".cfg");
 
@@ -428,7 +599,7 @@ void enregistrer_topscore(int score, char *nomLaby)
     fseek(fichier, 0, SEEK_SET);
 
     scoreJoueur scoreAenregistrer;
-    scoreAenregistrer.score = score;
+    scoreAenregistrer.score = scoreTotal;
     scoreJoueur scoreLu;
     scoreJoueur tableauScore[10];
 
@@ -489,13 +660,19 @@ void enregistrer_topscore(int score, char *nomLaby)
             position_caractere = 0;
             nbScore += 1;
         }
-
+        iCreationLaby.classementBar = IMG_Load("images/classementBar.png");
+        iCreationLaby.positionClassementBar.x = 950;
+        iCreationLaby.positionClassementBar.y = 100;
         if(nbScore == 0)
         {
+            /*
             printf("\n---------------------------------------------------------------------------\n");
             printf("\n\tBravo! Votre score va etre enregistre !\n");
             printf("\tEntrez votre nom : ");
-            scanf("%s", scoreAenregistrer.nomJoueur);
+            scanf("%s", scoreAenregistrer.nomJoueur);*/
+
+            saisie = recuperer_nom_score(ecran, iCreationLaby);
+            strcpy(scoreAenregistrer.nomJoueur, saisie.nomL);
 
             sprintf(chaineTemporaire, "%d", scoreAenregistrer.score);
             strcpy(ligneAinserer, scoreAenregistrer.nomJoueur);
@@ -504,25 +681,44 @@ void enregistrer_topscore(int score, char *nomLaby)
 
             fputs(ligneAinserer, fichier);
 
-            printf("\n--CLASSEMENT----------------------------------------------------------------\n");
-            printf("\n             Nom                           Score                            \n\n");
-            printf("\t%2d : %-30s%d\n", 1, scoreAenregistrer.nomJoueur, scoreAenregistrer.score);
+            afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLaby, tabMonstres, tailleTabMonstres, ecran, iCreationLaby, temps);
+            SDL_BlitSurface(iCreationLaby.malusTemps, NULL, ecran, &iCreationLaby.positionMalusTemps);
+            SDL_BlitSurface(iCreationLaby.scoreT, NULL, ecran, &iCreationLaby.positionScoreTotal);
+            SDL_BlitSurface(iCreationLaby.labelScore, NULL, ecran, &iCreationLaby.positionLabelScore);
+            SDL_BlitSurface(iCreationLaby.classementBar, NULL, ecran, &iCreationLaby.positionClassementBar);
+
+            sprintf(chaineTemporaire2, "%d", scoreAenregistrer.score);
+            labelNomJoueur = TTF_RenderText_Blended(police, scoreAenregistrer.nomJoueur, couleurBlanche);
+            labelScoreJoueur = TTF_RenderText_Blended(police, chaineTemporaire2, couleurBlanche);
+
+            positionLabelNomJoueur.y += 30;
+            positionLabelScoreJoueur.y += 30;
+            SDL_BlitSurface(labelNomJoueur, NULL, ecran, &positionLabelNomJoueur);
+            SDL_BlitSurface(labelScoreJoueur, NULL, ecran, &positionLabelScoreJoueur);
+
+            SDL_Flip(ecran);
         }
         else
         {
             int *p_nbScore = &nbScore;
             int i;
 
-            verifier_position_score(&tableauScore[0], p_nbScore, scoreAenregistrer);
+            verifier_position_score(&tableauScore[0], p_nbScore, scoreAenregistrer, ecran, iCreationLaby);
 
             fclose(fichier);
             fichier = fopen(nomFichier, "w+");
 
-            printf("\n--CLASSEMENT----------------------------------------------------------------\n");
-            printf("\n             Nom                           Score                            \n\n");
+            afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLaby, tabMonstres, tailleTabMonstres, ecran, iCreationLaby, temps);
+            SDL_BlitSurface(iCreationLaby.malusTemps, NULL, ecran, &iCreationLaby.positionMalusTemps);
+            SDL_BlitSurface(iCreationLaby.scoreT, NULL, ecran, &iCreationLaby.positionScoreTotal);
+            SDL_BlitSurface(iCreationLaby.labelScore, NULL, ecran, &iCreationLaby.positionLabelScore);
+            SDL_BlitSurface(iCreationLaby.classementBar, NULL, ecran, &iCreationLaby.positionClassementBar);
 
             for(i = 0; i < nbScore; i++)
             {
+                positionLabelNomJoueur.y += 30;
+                positionLabelScoreJoueur.y += 30;
+
                 memset(&ligneAinserer[0], 0, sizeof(ligneAinserer));
                 memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
 
@@ -530,7 +726,14 @@ void enregistrer_topscore(int score, char *nomLaby)
                 strcpy(ligneAinserer, tableauScore[i].nomJoueur);
                 strcat(ligneAinserer, ":");
                 strcat(ligneAinserer, chaineTemporaire);
-                printf("\t%2d : %-30s%d\n", i + 1, tableauScore[i].nomJoueur, tableauScore[i].score);
+                memset(&chaineTemporaire2[0], 0, sizeof(chaineTemporaire2));
+
+                sprintf(chaineTemporaire2, "%d", tableauScore[i].score);
+                labelNomJoueur = TTF_RenderText_Blended(police, tableauScore[i].nomJoueur, couleurBlanche);
+                labelScoreJoueur = TTF_RenderText_Blended(police, chaineTemporaire2, couleurBlanche);
+
+                SDL_BlitSurface(labelNomJoueur, NULL, ecran, &positionLabelNomJoueur);
+                SDL_BlitSurface(labelScoreJoueur, NULL, ecran, &positionLabelScoreJoueur);
 
                 if(i != 0)
                 {
@@ -538,12 +741,13 @@ void enregistrer_topscore(int score, char *nomLaby)
                 }
                 fputs(ligneAinserer, fichier);
             }
+            SDL_Flip(ecran);
         }
         fclose(fichier);
     }
     else
     {
-        printf("Impossible d'ouvrir\n");
+        /*printf("Impossible d'ouvrir\n");*/
     }
 }
 
@@ -780,45 +984,75 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
     int *p_score = &score;
 
     SDL_Event event;
+    /*SDL_Surface *malusTemps = NULL;
+    SDL_Surface *scoreT = NULL;
+    SDL_Surface *labelScore = NULL;
+    SDL_Rect positionMalusTemps;
+    SDL_Rect positionScoreTotal;
+    SDL_Rect positionLabelScore;*/
+
+    iCreation.positionMalusTemps.x = 1112;
+    iCreation.positionMalusTemps.y = 30;
+    iCreation.positionScoreTotal.x = 1112;
+    iCreation.positionScoreTotal.y = 54;
+    iCreation.positionLabelScore.x = 938;
+    iCreation.positionLabelScore.y = 25;
+
+    iCreation.labelScore = IMG_Load("images/labelScoreT.png");
+
+    char chaineTemporaire[8];
 
     time_t debut = time(NULL);
     time_t fin;
 
     int tailleTabMonstres;
 
+    TTF_Init();
+    SDL_Color couleurBlanche = {255, 0, 0};
+
+    TTF_Font *police = NULL;
+
+    police = TTF_OpenFont("times.ttf", 24);
+
     Monstre *tabMonstres = analyser_monstres(laby, nbLignes, nbColonnes, &tailleTabMonstres);
-    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+    afficher_labyrinthe(laby, nbLignes, nbColonnes, score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation, 0);
 
     int continuerAffichageLaby = 1;
     while(continuerAffichageLaby)
     {
-        SDL_WaitEvent(&event); /* On attend un événement qu'on récupère dans event */
-        switch(event.type) /* On teste le type d'événement */
+        SDL_WaitEvent(&event);
+        switch(event.type)
         {
             case SDL_QUIT:  continuerAffichageLaby = 0;
                             break;
 
-            case SDL_KEYDOWN: /* Si appui sur une touche */
+            case SDL_KEYDOWN:
                             switch (event.key.keysym.sym)
                             {
                                 case SDLK_ESCAPE:   continuerAffichageLaby = 0;
                                                     break;
 
-                                case SDLK_s:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                                                    deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                case SDLK_s:        fin = time(NULL);
+                                                    deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation, (int)difftime(fin, debut));
                                                     break;
 
-                                case SDLK_d:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                                                    deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                case SDLK_d:        fin = time(NULL);
+                                                    deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 0, 1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation, (int)difftime(fin, debut));
                                                     break;
 
-                                case SDLK_a:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                                                    deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                case SDLK_a:        fin = time(NULL);
+                                                    deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, 0, -1, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation, (int)difftime(fin, debut));
                                                     break;
 
-                                case SDLK_w:        deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
-                                                    deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation);
+                                case SDLK_w:        fin = time(NULL);
+                                                    deplacer_monstres(tabMonstres, nbLignes, nbColonnes, tailleTabMonstres, laby);
+                                                    deplacer(laby, nbLignes, nbColonnes, -1, 0, p_score, nomLabyrinthe, tabMonstres, tailleTabMonstres, ecran, iCreation, (int)difftime(fin, debut));
                                                     break;
+
+                                default:            break;
                             }
                             break;
 
@@ -843,7 +1077,18 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
             {
                 scoreTotal = 0;
             }
-            //enregistrer_topscore(scoreTotal, nomLabyrinthe);
+
+            sprintf(chaineTemporaire, "-%d pts", tempsPartie / 2);
+            iCreation.malusTemps = TTF_RenderText_Blended(police, chaineTemporaire, couleurBlanche);
+            memset(&chaineTemporaire[0], 0, sizeof(chaineTemporaire));
+            sprintf(chaineTemporaire, "%d pts", scoreTotal);
+            iCreation.scoreT = TTF_RenderText_Blended(police, chaineTemporaire, couleurBlanche);
+
+            /*SDL_BlitSurface(iCreation.labelScore, NULL, ecran, &iCreation.positionLabelScore);
+            SDL_BlitSurface(iCreation.malusTemps, NULL, ecran, &iCreation.positionMalusTemps);
+            SDL_BlitSurface(iCreation.scoreT, NULL, ecran, &iCreation.positionScoreTotal);
+            SDL_Flip(ecran);*/
+            enregistrer_topscore(scoreTotal, nomLabyrinthe, ecran, iCreation, laby, nbLignes, nbColonnes, tabMonstres, tailleTabMonstres, tempsPartie, score);
             continuerAffichageLaby = 0;
         }
     }
@@ -852,5 +1097,7 @@ void jouer(char *laby, size_t nbLignes, size_t nbColonnes, char *nomLabyrinthe, 
     positionActuelle_Y = 0;
     laby[nbColonnes * (nbLignes-2) + (nbColonnes - 1)] = ' ';
 
+    TTF_CloseFont(police);
+    TTF_Quit();
     return;
 }

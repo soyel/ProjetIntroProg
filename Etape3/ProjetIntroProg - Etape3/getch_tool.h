@@ -5,4 +5,4 @@ void initTermios(int echo);
 void resetTermios(void);
 char getch();
 
-#endif // GETCH_TOOL_H_INCLUDED
+#endif

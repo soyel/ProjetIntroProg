@@ -13,6 +13,9 @@
  */
 void remplir_fichier(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonnes)
 {
+    size_t i;
+    size_t j;
+
     char chaineTemporaire[4];
     sprintf(chaineTemporaire, "%d", (int) nbLignes);
 
@@ -24,9 +27,6 @@ void remplir_fichier(FILE *fichier, char *laby, size_t nbLignes, size_t nbColonn
 
     fputs(chaineTemporaire, fichier);
     fputs("\n", fichier);
-
-    size_t i;
-    size_t j;
 
     for(i=0; i<nbLignes; i++)
     {
